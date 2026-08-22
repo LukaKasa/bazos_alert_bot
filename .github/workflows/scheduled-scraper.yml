@@ -13,7 +13,6 @@ permissions:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,12 +41,12 @@ jobs:
           workflow: scheduled-scraper.yml
           workflow_conclusion: success
           if_no_artifact_found: ignore
-          
+
       - name: Run scraper
         env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        RUN_MODE: once
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          RUN_MODE: once
         run: uv run python -m src.main
 
       - name: Upload database

@@ -2,8 +2,8 @@ name: Scheduled Bazos Scraper
 
 on:
   schedule:
-    # Run at 8:00, 14:00, and 20:00 Central European Time (UTC+1)
-    - cron: "0 7,13,19 * * *" # Winter time schedule
+    # 5 běhů denně (CET přibližně: 8:00, 12:00, 16:00, 20:00, 23:00)
+    - cron: "0 7,11,15,19,22 * * *"
   workflow_dispatch:
 
 permissions:

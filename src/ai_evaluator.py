@@ -37,10 +37,8 @@ class AIEvaluator:
 
         price = int(price_clean)
 
-        prompt = f"""Jsi expert na český a slovenský bazarový trh (Bazoš → Vinted + Facebook Marketplace) v roce 2026.
-Specializuješ se na rychlý flipping věcí s vysokou likviditou: iPhony, AirPods, PlayStation, Nintendo Switch, Pokémon karty a značkové tenisky (Nike, Adidas, New Balance).
-
-Úkol: Rozhodni, jestli je tato nabídka výhodná a dostatečně důvěryhodná pro rychlý prodej (ideálně do několika dnů).
+        prompt = f"""Jsi přísný expert na český a slovenský bazarový trh (Bazoš → Vinted + Facebook Marketplace) v roce 2026.
+Specializuješ se na rychlý flipping s vysokou likviditou. Posíláš notifikace POUZE u opravdu zajímavých a důvěryhodných nabídek.
 
 Nabídka:
 - Titulek: {title}
@@ -48,35 +46,49 @@ Nabídka:
 - Lokalita: {location or "neznámá"}
 - Popis: {(description or "bez popisu")[:550]}
 
-Pravidla hodnocení:
-
+ZÁKLADNÍ PRAVIDLA:
 1. Odhadni realistickou tržní cenu použitého kusu v dobrém stavu v ČR/SK (2026).
-2. Spočítej slevu v procentech (záporné číslo = pod tržní cenou).
-3. Doporuč koupit, pokud je sleva mezi 8 % a 50 % pod trhem A nabídka působí důvěryhodně.
-4. U slev 8–30 %: běžně doporučuj, pokud nevypadá na podvod.
-5. U slev 30–50 %: doporučuj POUZE pokud nabídka působí velmi důvěryhodně.
+2. Spočítej slevu (záporné číslo = pod trhem).
+3. Doporuč koupit POUZE pokud je sleva 8–50 % pod trhem A nabídka je atraktivní + důvěryhodná.
 
-Kontrola důvěryhodnosti:
-- Podezřelé formulace: „cenu nabídněte“, „jen dnes“, „rychle“, „nutno prodat“, „odvoz ihned“
-- Neexistující nebo budoucí modely = vždy podvod
-- Stock fotky / příliš dokonalé fotky u drahých věcí = vyšší riziko
-- Chybějící detaily o stavu = opatrnost
+PŘÍSNÁ PRAVIDLA PODLE KATEGORIE:
 
-Speciální znalosti pro rychlý prodej:
-- iPhone: klíčová je kondice baterie (ideálně 85 %+), originální krabička zvyšuje cenu
-- AirPods: originál vs. padělek – u podezřele levných kousků buď opatrný
-- PlayStation 4/5: kompletní set (krabice + kabely + ovladač) = lepší prodejnost
-- Nintendo Switch: OLED verze je žádanější, sleduj stav joy-conů a krabičku
-- Pokémon TCG: graded karty (PSA/CGC) a moderní sety mají dobrou likviditu
-- Nike / Adidas tenisky: stav podrážky, krabička a originalita rozhodují. Čisté, málo nošené páry jdou nejrychleji
-- Notebooky: jen kvalitní značky (MacBook, ThinkPad, XPS) v dobrém stavu
+**Konzole (Nintendo Switch / PlayStation):**
+- Preferuj kompletní sety (krabice, kabely, alespoň 1 ovladač).
+- Switch OLED je žádanější než klasický V1/V2.
+- Samostatné levné hry (Just Dance, sportovní, méně žádané tituly) → VŽDY odmítnout.
+- Posílej jen pokud je cena výrazně lepší než běžný trh.
 
-Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další text):
+**Hry:**
+- Posílej POUZE žádané tituly: Mario, Zelda, Animal Crossing, Super Smash, Pokémon (hry), God of War, Spider-Man, Horizon, The Last of Us, Ghost of Tsushima, GTA, kvalitní FIFA/FC, Call of Duty atd.
+- Levné / méně žádané hry (Just Dance, různé taneční, sportovní low-tier) → odmítnout.
+
+**Tenisky (Nike / Adidas):**
+- Posílej jen pokud jsou v dobrém stavu (čisté, málo nošené, dobrá podrážka).
+- Preferuj populární modely (Air Force, Dunk, Samba, Gazelle, Campus, Ultraboost atd.).
+- Velmi ošoupané nebo podezřele levné = odmítnout.
+
+**iPhone / AirPods:**
+- iPhone: důležitá kondice baterie (ideálně 85 %+).
+- AirPods: originál vs. padělek – u velmi nízkých cen buď opatrný.
+
+**Pokémon karty:**
+- Preferuj graded (PSA/CGC) nebo moderní žádané sety / rare karty.
+- Běžné bulk karty za pár korun → odmítnout.
+
+**Obecně odmítni:**
+- Podezřelé formulace („cenu nabídněte“, „jen dnes“, „nutno prodat“)
+- Neexistující / budoucí modely
+- Stock fotky + podezřele nízká cena
+- Nedostatečný popis u drahých věcí
+- Jednotlivé levné hry a low-demand věci
+
+Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
 {{
   "market_price_estimate": číslo,
   "discount_percent": číslo,
   "should_buy": true/false,
-  "reason": "krátké zdůvodnění česky (1-2 věty). Uveď proč je nebo není důvěryhodné a proč do toho jít / nejít."
+  "reason": "krátké zdůvodnění česky (1-2 věty). Uveď proč ano/ne a jestli je to atraktivní pro rychlý prodej."
 }}
 """
 
@@ -86,7 +98,7 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
             payload = {
                 "contents": [{"parts": [{"text": prompt}]}],
                 "generationConfig": {
-                    "temperature": 0.15,
+                    "temperature": 0.12,
                     "maxOutputTokens": 500,
                     "responseMimeType": "application/json"
                 }

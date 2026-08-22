@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class AIEvaluator:
     def __init__(self):
         self.api_key = os.environ.get("GEMINI_API_KEY")
-        self.model = "gemini-2.5-flash"
+        self.model = "gemini-3.5-flash-lite"
         self.base_url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
 
     def evaluate_deal(

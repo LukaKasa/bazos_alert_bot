@@ -1,5 +1,6 @@
 import logging
 import time
+import random
 from typing import List
 
 from .config import Config
@@ -84,16 +85,21 @@ class AutoAlertBot:
             logger.debug(f"Processed {len(listings)} listings, no new ones found")
 
     def run_search_cycle(self):
+        """Run one complete search cycle for all configured searches."""
         logger.info("Starting search cycle")
-        for search_config in self.config.searches:
+        searches = self.config.searches
+
+        for i, search_config in enumerate(searches):
             source = search_config.get("source")
             if not source:
                 logger.warning(f"Search config missing source: {search_config}")
                 continue
+
             scraper = self.scrapers.get(source)
             if not scraper:
                 logger.warning(f"No scraper available for source: {source}")
                 continue
+
             try:
                 logger.info(
                     f"Scraping {source} with query: {search_config.get('name', 'unnamed')}"
@@ -107,9 +113,17 @@ class AutoAlertBot:
                     message=f"Error scraping {source}: {str(e)}",
                     color=0xFF0000,
                 )
+
+            # ===== A) Anti-bot pauza mezi kategoriemi =====
+            if i < len(searches) - 1:
+                delay = random.uniform(4.0, 9.0)
+                logger.info(f"Anti-bot delay between searches: {delay:.1f}s")
+                time.sleep(delay)
+
         logger.info("Search cycle completed")
 
     def run_once(self):
+        """Run one search cycle and exit (for cron/scheduled tasks)."""
         logger.info("Bot starting in run-once mode")
         try:
             self.run_search_cycle()
@@ -124,6 +138,7 @@ class AutoAlertBot:
             raise
 
     def run_forever(self):
+        """Run the bot continuously with configured interval."""
         logger.info(
             f"Bot starting in continuous mode (interval: {DEFAULT_INTERVAL_MINUTES} minutes)"
         )

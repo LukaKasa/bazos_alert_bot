@@ -19,9 +19,10 @@ class AutoAlertBot:
         self.database = ListingDatabase(self.config.database_path)
         self.notifier = DiscordNotifier()
         self.ai_evaluator = AIEvaluator()
-        self.scrapers = {
+       self.scrapers = {
             "bazos_sk": BazosScraper("bazos_sk"),
             "bazos_cz": BazosScraper("bazos_cz"),
+            "sbazar_cz": SbazarScraper("sbazar_cz"),
         }
         logger.info("AutoAlertBot initialized")
 

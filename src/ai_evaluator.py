@@ -31,17 +31,16 @@ class AIEvaluator:
             logger.warning("GEMINI_API_KEY not set – skipping AI evaluation")
             return False, "Gemini API key missing", None
 
-        # Extrahuj číslo z ceny
         price_clean = re.sub(r"[^\d]", "", price_str or "")
         if not price_clean:
             return False, "Nelze přečíst cenu", None
 
         price = int(price_clean)
 
-        prompt = f"""Jsi expert na český bazarový trh (Bazoš, Sbazar, Vinted, Facebook Marketplace) v roce 2026.
-Specializuješ se na flipping elektroniky, herních konzolí a sběratelských předmětů.
+        prompt = f"""Jsi expert na český a slovenský bazarový trh (Bazoš → Vinted + Facebook Marketplace) v roce 2026.
+Specializuješ se na rychlý flipping věcí s vysokou likviditou: iPhony, AirPods, PlayStation, Nintendo Switch, Pokémon karty a značkové tenisky (Nike, Adidas, New Balance).
 
-Úkol: Rozhodni, jestli je tato nabídka výhodná a dostatečně důvěryhodná pro rychlý flipping.
+Úkol: Rozhodni, jestli je tato nabídka výhodná a dostatečně důvěryhodná pro rychlý prodej (ideálně do několika dnů).
 
 Nabídka:
 - Titulek: {title}
@@ -51,25 +50,26 @@ Nabídka:
 
 Pravidla hodnocení:
 
-1. Odhadni realistickou tržní cenu použitého kusu v dobrém stavu v ČR (2026).
+1. Odhadni realistickou tržní cenu použitého kusu v dobrém stavu v ČR/SK (2026).
 2. Spočítej slevu v procentech (záporné číslo = pod tržní cenou).
-3. Doporuč koupit, pokud je sleva mezi 8 % a 50 % pod trhem A zároveň nabídka působí důvěryhodně.
+3. Doporuč koupit, pokud je sleva mezi 8 % a 50 % pod trhem A nabídka působí důvěryhodně.
 4. U slev 8–30 %: běžně doporučuj, pokud nevypadá na podvod.
 5. U slev 30–50 %: doporučuj POUZE pokud nabídka působí velmi důvěryhodně.
 
-Kontrola důvěryhodnosti (velmi důležité):
-- Podezřelé formulace: „cenu nabídněte“, „jen dnes“, „rychle“, „nutno prodat“, „nemám čas“, „odvoz ihned“
-- Neexistující nebo budoucí modely (iPhone 17, Galaxy Z Fold 8, iPhone Air atd.) = vždy podvod
-- Příliš dokonalé / stock fotky (zejména u drahých telefonů a konzolí) = vyšší riziko
-- Chybějící detaily o stavu, baterii, příslušenství = opatrnost
-- Velmi nízká cena + minimální popis = vysoké riziko
-- Rare PS3 (CECHAxx, CECHExx, speciální edice) a graded Pokémon karty posuzuj přísněji, ale pozitivně, pokud sedí detaily
+Kontrola důvěryhodnosti:
+- Podezřelé formulace: „cenu nabídněte“, „jen dnes“, „rychle“, „nutno prodat“, „odvoz ihned“
+- Neexistující nebo budoucí modely = vždy podvod
+- Stock fotky / příliš dokonalé fotky u drahých věcí = vyšší riziko
+- Chybějící detaily o stavu = opatrnost
 
-Speciální znalosti:
-- PlayStation 3: CECHAxx / CECHExx (4× USB + PS2 kompatibilita) a speciální edice mají vyšší hodnotu.
-- PlayStation 4 Fat a PS5 Fat: sleduj kompletní sety.
-- Pokémon TCG: moderní sety, graded karty (PSA/CGC), starší rare/holo.
-- iPhone: důležitá je kondice baterie (ideálně 85 %+).
+Speciální znalosti pro rychlý prodej:
+- iPhone: klíčová je kondice baterie (ideálně 85 %+), originální krabička zvyšuje cenu
+- AirPods: originál vs. padělek – u podezřele levných kousků buď opatrný
+- PlayStation 4/5: kompletní set (krabice + kabely + ovladač) = lepší prodejnost
+- Nintendo Switch: OLED verze je žádanější, sleduj stav joy-conů a krabičku
+- Pokémon TCG: graded karty (PSA/CGC) a moderní sety mají dobrou likviditu
+- Nike / Adidas tenisky: stav podrážky, krabička a originalita rozhodují. Čisté, málo nošené páry jdou nejrychleji
+- Notebooky: jen kvalitní značky (MacBook, ThinkPad, XPS) v dobrém stavu
 
 Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další text):
 {{
@@ -81,20 +81,10 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
 """
 
         try:
-            headers = {
-                "Content-Type": "application/json",
-            }
-            params = {
-                "key": self.api_key
-            }
+            headers = {"Content-Type": "application/json"}
+            params = {"key": self.api_key}
             payload = {
-                "contents": [
-                    {
-                        "parts": [
-                            {"text": prompt}
-                        ]
-                    }
-                ],
+                "contents": [{"parts": [{"text": prompt}]}],
                 "generationConfig": {
                     "temperature": 0.15,
                     "maxOutputTokens": 500,
@@ -114,7 +104,6 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
 
             content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
 
-            # Vyčisti případný markdown
             if content.startswith("```"):
                 content = re.sub(r"^```(?:json)?\n?", "", content)
                 content = re.sub(r"\n?```$", "", content)
@@ -125,7 +114,7 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
             discount = result.get("discount_percent")
             reason = result.get("reason", "bez důvodu")
 
-            # Dodatečná kontrola rozsahu 8–50 %
+            # Kontrola rozsahu 8–50 %
             if should_buy and discount is not None:
                 try:
                     disc = float(discount)
@@ -139,9 +128,7 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
                 f"Gemini eval: {title[:55]}... → buy={should_buy}, discount={discount}%, reason={reason}"
             )
 
-            # Pauza kvůli rate limitu free tieru
             time.sleep(1.7)
-
             return should_buy, reason, discount
 
         except Exception as e:

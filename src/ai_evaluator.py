@@ -64,9 +64,12 @@ PŘÍSNÁ PRAVIDLA PODLE KATEGORIE:
 - Levné / méně žádané hry (Just Dance, různé taneční, sportovní low-tier) → odmítnout.
 
 **Tenisky (Nike / Adidas):**
-- Posílej jen pokud jsou v dobrém stavu (čisté, málo nošené, dobrá podrážka).
-- Preferuj populární modely (Air Force, Dunk, Samba, Gazelle, Campus, Ultraboost atd.).
-- Velmi ošoupané nebo podezřele levné = odmítnout.
+- Posílej POUZE žádané a likvidní modely s rychlým prodejem na Vinted:
+  • Nike: Air Force 1, Dunk Low/High, Jordan 1, Jordan 4, Blazer, Cortez
+  • Adidas: Samba, Gazelle, Campus, Spezial, Ultraboost, Superstar, Stan Smith, Handball Spezial
+- Méně žádané / niche modely (Kamanda, starší běžecké, neznámé collaby, málo hledané silhouetty) → VŽDY odmítnout.
+- Stav: jen dobrý až výborný (čisté, málo nošené, dobrá podrážka).
+- Podezřele levné + špatné fotky = odmítnout.
 
 **iPhone / AirPods / Apple Watch / iPad:**
 - iPhone: důležitá kondice baterie (ideálně 85 %+).
@@ -89,6 +92,7 @@ PŘÍSNÁ PRAVIDLA PODLE KATEGORIE:
 - Stock fotky + podezřele nízká cena
 - Nedostatečný popis u drahých věcí
 - Jednotlivé levné hry a low-demand věci
+- Méně žádané tenisky (Kamanda a podobné)
 
 Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
 {{

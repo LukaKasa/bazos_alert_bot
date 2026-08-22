@@ -6,7 +6,7 @@ from typing import List
 from .config import Config
 from .database import ListingDatabase
 from .notifier import DiscordNotifier
-from .scrapers import BazosScraper, Listing
+from .scrapers import BazosScraper, SbazarScraper, Listing
 from .ai_evaluator import AIEvaluator
 
 logger = logging.getLogger(__name__)

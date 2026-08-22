@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import re
+import time
 from typing import Optional, Tuple
 
 import requests
@@ -23,8 +24,6 @@ class AIEvaluator:
         location: str = "",
     ) -> Tuple[bool, str, Optional[float]]:
         """
-        import time
-time.sleep(1.5)
         Returns:
             (should_notify, reason, discount_percent)
         """
@@ -39,22 +38,31 @@ time.sleep(1.5)
 
         price = int(price_clean)
 
-        prompt = f"""Jsi expert na český bazarový trh s použitou elektronikou a šperky (Bazoš, Vinted, Sbazar, Aukro).
+        prompt = f"""Jsi expert na český bazarový trh (Bazoš, Sbazar, Vinted, Facebook Marketplace) v roce 2026.
+Specializuješ se na flipping elektroniky, herních konzolí a sběratelských předmětů.
 
-Úkol: Ohodnoť, jestli je tato nabídka výhodná pro flipping (koupit levně a prodat dráž).
+Úkol: Rozhodni, jestli je tato nabídka výhodná pro rychlý flipping (koupit levně → prodat dráž).
 
 Nabídka:
 - Titulek: {title}
 - Cena: {price} Kč
 - Lokalita: {location or "neznámá"}
-- Popis: {(description or "bez popisu")[:400]}
+- Popis: {(description or "bez popisu")[:500]}
 
-Pravidla:
-1. Odhadni realistickou tržní cenu použitého kusu v dobrém stavu v ČR (rok 2026).
+Pravidla hodnocení:
+
+1. Odhadni realistickou tržní cenu použitého kusu v dobrém stavu v ČR (2026).
 2. Spočítej slevu v procentech (záporné číslo = pod tržní cenou).
-3. Doporuč koupit POUZE pokud je sleva mezi 2 % a 30 % pod trhem.
-4. Sleva větší než 30 % = rizikové (často vadné/podvod).
-5. Cena nad trhem nebo jen minimálně pod = nekupovat.
+3. Doporuč koupit POUZE pokud je sleva mezi 8 % a 28 % pod trhem.
+4. Sleva větší než 30 % = velmi rizikové (podvod / vadné / kradené).
+5. Sleva menší než 8 % = málo zajímavé.
+
+Speciální znalosti:
+- PlayStation 3: Hledej rare modely CECHAxx, CECHExx (4× USB + PS2 kompatibilita), speciální edice (Metal Gear Solid 4 Gunmetal, Final Fantasy XIII atd.). Ty mají vyšší hodnotu.
+- PlayStation 4 Fat a PS5 Fat: Sleduj kompletní sety (krabička + hry).
+- Pokémon TCG: Moderní sety, graded karty (PSA/CGC), starší rare/holo mají dobrou likviditu.
+- iPhone: Důležitá je kondice baterie (ideálně 85 %+).
+- Podezřele nízké ceny u nových modelů (iPhone 16/17, Galaxy Z Fold 8 atd.) = téměř vždy podvod.
 
 Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další text):
 {{
@@ -81,9 +89,9 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
                     }
                 ],
                 "generationConfig": {
-                    "temperature": 0.2,
-                    "maxOutputTokens": 400,
-                    "responseMimeType": "application/json"  # Gemini umí vynutit JSON
+                    "temperature": 0.15,
+                    "maxOutputTokens": 450,
+                    "responseMimeType": "application/json"
                 }
             }
 
@@ -92,12 +100,11 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
                 headers=headers,
                 params=params,
                 json=payload,
-                timeout=30
+                timeout=35
             )
             response.raise_for_status()
             data = response.json()
 
-            # Gemini struktura odpovědi
             content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
 
             # Vyčisti případný markdown
@@ -111,17 +118,26 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown, žádný další 
             discount = result.get("discount_percent")
             reason = result.get("reason", "bez důvodu")
 
-            # Dodatečná kontrola rozsahu 2–30 %
+            # Dodatečná kontrola rozsahu 8–28 %
             if should_buy and discount is not None:
-                if not (2 <= abs(float(discount)) <= 30 and float(discount) < 0):
+                try:
+                    disc = float(discount)
+                    if not (8 <= abs(disc) <= 28 and disc < 0):
+                        should_buy = False
+                        reason += " (mimo rozsah 8–28 %)"
+                except (TypeError, ValueError):
                     should_buy = False
-                    reason += " (mimo rozsah 2–30 %)"
 
             logger.info(
-                f"Gemini eval: {title[:50]}... → buy={should_buy}, discount={discount}%, reason={reason}"
+                f"Gemini eval: {title[:55]}... → buy={should_buy}, discount={discount}%, reason={reason}"
             )
+
+            # Pauza kvůli rate limitu free tieru
+            time.sleep(1.6)
+
             return should_buy, reason, discount
 
         except Exception as e:
             logger.error(f"Gemini evaluation failed: {e}")
-            return False, f"Chyba Gemini: {str(e)[:120]}", None
+            time.sleep(2.0)  # při chybě delší pauza
+            return False, f"Chyba Gemini: {str(e)[:130]}", None

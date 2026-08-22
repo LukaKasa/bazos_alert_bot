@@ -23,6 +23,8 @@ class AIEvaluator:
         location: str = "",
     ) -> Tuple[bool, str, Optional[float]]:
         """
+        import time
+time.sleep(1.5)
         Returns:
             (should_notify, reason, discount_percent)
         """

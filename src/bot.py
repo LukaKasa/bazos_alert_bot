@@ -45,8 +45,7 @@ class AutoAlertBot:
                 self.database.update_last_checked(listing.listing_id, listing.source)
 
             if not self.database.is_listing_notified(listing.listing_id, listing.source):
-                # ========== AI FILTR ==========
-                should_notify, reason, discount = self.ai_evaluator.evaluate_deal(
+                should_notify, reason, discount, market_price = self.ai_evaluator.evaluate_deal(
                     title=listing.title,
                     price_str=listing.price or "",
                     description=listing.description or "",
@@ -69,16 +68,15 @@ class AutoAlertBot:
                         description=short_desc,
                         ai_reason=reason,
                         discount=discount,
+                        market_price=market_price,
                         color=0x00FF00,
                     )
                     self.database.mark_as_notified(listing.listing_id, listing.source)
                     new_count += 1
                     logger.info(f"GOOD DEAL notified: {listing.title} ({reason})")
                 else:
-                    # I když neposíláme, označíme jako notified, ať to nezkouší znovu
                     self.database.mark_as_notified(listing.listing_id, listing.source)
                     logger.info(f"Skipped (not good enough): {listing.title} – {reason}")
-                # ==============================
 
         if new_count > 0:
             logger.info(f"Notified {new_count} good deals")
@@ -86,7 +84,6 @@ class AutoAlertBot:
             logger.debug(f"Processed {len(listings)} listings, no new ones found")
 
     def run_search_cycle(self):
-        """Run one complete search cycle for all configured searches."""
         logger.info("Starting search cycle")
         for search_config in self.config.searches:
             source = search_config.get("source")
@@ -113,7 +110,6 @@ class AutoAlertBot:
         logger.info("Search cycle completed")
 
     def run_once(self):
-        """Run one search cycle and exit (for cron/scheduled tasks)."""
         logger.info("Bot starting in run-once mode")
         try:
             self.run_search_cycle()
@@ -128,7 +124,6 @@ class AutoAlertBot:
             raise
 
     def run_forever(self):
-        """Run the bot continuously with configured interval."""
         logger.info(
             f"Bot starting in continuous mode (interval: {DEFAULT_INTERVAL_MINUTES} minutes)"
         )

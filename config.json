@@ -20,15 +20,31 @@
       "max_pages": 2
     },
     {
-      "name": "PlayStation",
+      "name": "PlayStation konzole",
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/inzeraty/playstation/",
       "max_pages": 2
     },
     {
-      "name": "Nintendo Switch",
+      "name": "Nintendo Switch konzole",
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/inzeraty/nintendo/",
+      "max_pages": 2
+    },
+    {
+      "name": "Žádané hry Nintendo",
+      "source": "bazos_cz",
+      "search_term": "Mario OR Zelda OR \"Animal Crossing\" OR \"Super Smash\" OR Pokémon OR Kart OR Odyssey OR \"Breath of the Wild\" OR \"Tears of the Kingdom\"",
+      "price_min": 300,
+      "price_max": 2500,
+      "max_pages": 2
+    },
+    {
+      "name": "Žádané hry PlayStation",
+      "source": "bazos_cz",
+      "search_term": "\"God of War\" OR \"Spider-Man\" OR \"Horizon\" OR \"The Last of Us\" OR \"Ghost of Tsushima\" OR \"Red Dead\" OR \"GTA\" OR \"FIFA\" OR \"FC 25\" OR \"FC 26\" OR \"Call of Duty\"",
+      "price_min": 200,
+      "price_max": 2000,
       "max_pages": 2
     },
     {

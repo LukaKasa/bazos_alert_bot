@@ -22,18 +22,18 @@ class AIEvaluator:
         price_str: str,
         description: str = "",
         location: str = "",
-    ) -> Tuple[bool, str, Optional[float]]:
+    ) -> Tuple[bool, str, Optional[float], Optional[int]]:
         """
         Returns:
-            (should_notify, reason, discount_percent)
+            (should_notify, reason, discount_percent, market_price_estimate)
         """
         if not self.api_key:
             logger.warning("GEMINI_API_KEY not set – skipping AI evaluation")
-            return False, "Gemini API key missing", None
+            return False, "Gemini API key missing", None, None
 
         price_clean = re.sub(r"[^\d]", "", price_str or "")
         if not price_clean:
-            return False, "Nelze přečíst cenu", None
+            return False, "Nelze přečíst cenu", None, None
 
         price = int(price_clean)
 
@@ -68,13 +68,20 @@ PŘÍSNÁ PRAVIDLA PODLE KATEGORIE:
 - Preferuj populární modely (Air Force, Dunk, Samba, Gazelle, Campus, Ultraboost atd.).
 - Velmi ošoupané nebo podezřele levné = odmítnout.
 
-**iPhone / AirPods:**
+**iPhone / AirPods / Apple Watch / iPad:**
 - iPhone: důležitá kondice baterie (ideálně 85 %+).
 - AirPods: originál vs. padělek – u velmi nízkých cen buď opatrný.
+
+**Lego:**
+- Preferuj kompletní / nové sety, Star Wars, Technic, Icons.
+- Velké drahé sety posuzuj opatrně (logistika).
 
 **Pokémon karty:**
 - Preferuj graded (PSA/CGC) nebo moderní žádané sety / rare karty.
 - Běžné bulk karty za pár korun → odmítnout.
+
+**Šperky:**
+- Hlavně zlato a stříbro. Podezřele levné = opatrnost.
 
 **Obecně odmítni:**
 - Podezřelé formulace („cenu nabídněte“, „jen dnes“, „nutno prodat“)
@@ -126,6 +133,12 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
             discount = result.get("discount_percent")
             reason = result.get("reason", "bez důvodu")
 
+            market_price = result.get("market_price_estimate")
+            try:
+                market_price = int(market_price) if market_price is not None else None
+            except (TypeError, ValueError):
+                market_price = None
+
             # Kontrola rozsahu 8–50 %
             if should_buy and discount is not None:
                 try:
@@ -137,13 +150,13 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
                     should_buy = False
 
             logger.info(
-                f"Gemini eval: {title[:55]}... → buy={should_buy}, discount={discount}%, reason={reason}"
+                f"Gemini eval: {title[:55]}... → buy={should_buy}, discount={discount}%, market={market_price}, reason={reason}"
             )
 
             time.sleep(1.7)
-            return should_buy, reason, discount
+            return should_buy, reason, discount, market_price
 
         except Exception as e:
             logger.error(f"Gemini evaluation failed: {e}")
             time.sleep(2.2)
-            return False, f"Chyba Gemini: {str(e)[:130]}", None
+            return False, f"Chyba Gemini: {str(e)[:130]}", None, None

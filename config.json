@@ -8,46 +8,52 @@
       "max_pages": 2
     },
     {
-      "name": "Samsung telefony",
+      "name": "iPhone obecně",
       "source": "bazos_cz",
-      "url": "https://mobil.bazos.cz/inzeraty/samsung/",
+      "url": "https://mobil.bazos.cz/inzeraty/iphone/",
       "max_pages": 2
     },
     {
-      "name": "AirPods / sluchátka",
+      "name": "AirPods",
       "source": "bazos_cz",
       "url": "https://mobil.bazos.cz/inzeraty/airpods/",
+      "max_pages": 2
+    },
+    {
+      "name": "PlayStation",
+      "source": "bazos_cz",
+      "url": "https://pc.bazos.cz/inzeraty/playstation/",
+      "max_pages": 2
+    },
+    {
+      "name": "Nintendo Switch",
+      "source": "bazos_cz",
+      "url": "https://pc.bazos.cz/inzeraty/nintendo/",
+      "max_pages": 2
+    },
+    {
+      "name": "Pokémon",
+      "source": "bazos_cz",
+      "url": "https://ostatni.bazos.cz/inzeraty/pokemon/",
+      "max_pages": 2
+    },
+    {
+      "name": "Nike tenisky",
+      "source": "bazos_cz",
+      "url": "https://obleceni.bazos.cz/inzeraty/nike/",
+      "max_pages": 2
+    },
+    {
+      "name": "Adidas tenisky",
+      "source": "bazos_cz",
+      "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
       "max_pages": 2
     },
     {
       "name": "Notebooky",
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/notebook/",
-      "max_pages": 2
-    },
-    {
-      "name": "Šperky",
-      "source": "bazos_cz",
-      "url": "https://ostatni.bazos.cz/inzeraty/sperky/",
-      "max_pages": 2
-    },
-    {
-      "name": "Pokémon karty a sběratelství",
-      "source": "bazos_cz",
-      "url": "https://ostatni.bazos.cz/inzeraty/pokemon/",
-      "max_pages": 2
-    },
-    {
-      "name": "PlayStation konzole",
-      "source": "bazos_cz",
-      "url": "https://pc.bazos.cz/inzeraty/playstation/",
-      "max_pages": 2
-    },
-    {
-      "name": "PS3 rare / speciálky",
-      "source": "bazos_cz",
-      "url": "https://pc.bazos.cz/?hledat=CECHA+OR+CECHE+OR+CECHL+OR+CECHZ+OR+%22Metal+Gear%22+OR+%22Final+Fantasy%22+OR+%224+USB%22&rubriky=pc",
-      "max_pages": 2
+      "max_pages": 1
     }
   ]
 }

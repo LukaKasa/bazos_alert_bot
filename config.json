@@ -8,11 +8,15 @@
       "max_pages": 2
     },
     {
-      "name": "Samsung + AirPods",
+      "name": "Samsung telefony",
       "source": "bazos_cz",
-      "search_term": "samsung OR airpods OR galaxy",
-      "price_min": 500,
-      "price_max": 15000,
+      "url": "https://mobil.bazos.cz/inzeraty/samsung/",
+      "max_pages": 2
+    },
+    {
+      "name": "AirPods / sluchátka",
+      "source": "bazos_cz",
+      "url": "https://mobil.bazos.cz/inzeraty/airpods/",
       "max_pages": 2
     },
     {
@@ -22,11 +26,27 @@
       "max_pages": 2
     },
     {
-      "name": "Šperky stříbro/zlato",
+      "name": "Šperky",
       "source": "bazos_cz",
-      "search_term": "stříbrný OR stříbro OR zlatý náramek OR prsten",
-      "price_min": 200,
-      "price_max": 8000,
+      "url": "https://ostatni.bazos.cz/inzeraty/sperky/",
+      "max_pages": 2
+    },
+    {
+      "name": "Pokémon karty a sběratelství",
+      "source": "bazos_cz",
+      "url": "https://ostatni.bazos.cz/inzeraty/pokemon/",
+      "max_pages": 2
+    },
+    {
+      "name": "PlayStation konzole",
+      "source": "bazos_cz",
+      "url": "https://pc.bazos.cz/inzeraty/playstation/",
+      "max_pages": 2
+    },
+    {
+      "name": "PS3 rare / speciálky",
+      "source": "bazos_cz",
+      "url": "https://pc.bazos.cz/?hledat=CECHA+OR+CECHE+OR+CECHL+OR+CECHZ+OR+%22Metal+Gear%22+OR+%22Final+Fantasy%22+OR+%224+USB%22&rubriky=pc",
       "max_pages": 2
     }
   ]

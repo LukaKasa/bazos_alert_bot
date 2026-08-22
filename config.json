@@ -20,6 +20,18 @@
       "max_pages": 2
     },
     {
+      "name": "Apple Watch",
+      "source": "bazos_cz",
+      "url": "https://mobil.bazos.cz/inzeraty/apple-watch/",
+      "max_pages": 2
+    },
+    {
+      "name": "iPad",
+      "source": "bazos_cz",
+      "url": "https://pc.bazos.cz/inzeraty/ipad/",
+      "max_pages": 1
+    },
+    {
       "name": "PlayStation konzole",
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/inzeraty/playstation/",
@@ -34,7 +46,7 @@
     {
       "name": "Žádané hry Nintendo",
       "source": "bazos_cz",
-      "search_term": "Mario OR Zelda OR \"Animal Crossing\" OR \"Super Smash\" OR Pokémon OR Kart OR Odyssey OR \"Breath of the Wild\" OR \"Tears of the Kingdom\"",
+      "search_term": "Mario OR Zelda OR \"Animal Crossing\" OR \"Super Smash\" OR Kart OR Odyssey OR \"Breath of the Wild\" OR \"Tears of the Kingdom\"",
       "price_min": 300,
       "price_max": 2500,
       "max_pages": 2
@@ -42,9 +54,15 @@
     {
       "name": "Žádané hry PlayStation",
       "source": "bazos_cz",
-      "search_term": "\"God of War\" OR \"Spider-Man\" OR \"Horizon\" OR \"The Last of Us\" OR \"Ghost of Tsushima\" OR \"Red Dead\" OR \"GTA\" OR \"FIFA\" OR \"FC 25\" OR \"FC 26\" OR \"Call of Duty\"",
+      "search_term": "\"God of War\" OR \"Spider-Man\" OR \"Horizon\" OR \"The Last of Us\" OR \"Ghost of Tsushima\" OR \"Red Dead\" OR GTA OR \"Call of Duty\"",
       "price_min": 200,
       "price_max": 2000,
+      "max_pages": 2
+    },
+    {
+      "name": "Lego",
+      "source": "bazos_cz",
+      "url": "https://deti.bazos.cz/inzeraty/lego/",
       "max_pages": 2
     },
     {
@@ -63,6 +81,12 @@
       "name": "Adidas tenisky",
       "source": "bazos_cz",
       "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
+      "max_pages": 2
+    },
+    {
+      "name": "Šperky zlato/stříbro",
+      "source": "bazos_cz",
+      "url": "https://ostatni.bazos.cz/inzeraty/sperky/",
       "max_pages": 2
     },
     {

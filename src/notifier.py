@@ -27,11 +27,9 @@ class DiscordNotifier:
         description: Optional[str] = None,
         ai_reason: Optional[str] = None,
         discount: Optional[float] = None,
+        market_price: Optional[int] = None,
         color: int = 0x3498DB,
     ) -> bool:
-        """
-        Send a listing notification to Discord with clear AI assessment.
-        """
         if not self.webhook_url:
             logger.error("Cannot send notification: webhook URL not configured")
             return False
@@ -41,8 +39,12 @@ class DiscordNotifier:
         if price:
             fields.append({"name": "💰 Cena", "value": str(price), "inline": True})
 
-        if location:
-            fields.append({"name": "📍 Lokalita", "value": str(location), "inline": True})
+        if market_price is not None:
+            fields.append({
+                "name": "🏷️ Běžná tržní cena",
+                "value": f"{market_price:,} Kč".replace(",", " "),
+                "inline": True
+            })
 
         if discount is not None:
             fields.append({
@@ -51,11 +53,13 @@ class DiscordNotifier:
                 "inline": True
             })
 
-        # AI hodnocení – vždy celé, neořezané
+        if location:
+            fields.append({"name": "📍 Lokalita", "value": str(location), "inline": True})
+
         if ai_reason:
             fields.append({
                 "name": "🤖 AI hodnocení",
-                "value": ai_reason[:1000],  # Discord field limit je 1024
+                "value": ai_reason[:1000],
                 "inline": False
             })
 
@@ -65,10 +69,9 @@ class DiscordNotifier:
             "color": color,
             "fields": fields,
             "footer": {"text": "New Listing Alert"},
-            "timestamp": self._get_timestamp(),
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
-        # Krátký popis inzerátu (max ~300 znaků)
         if description:
             desc = description.strip()
             if len(desc) > 300:
@@ -78,8 +81,7 @@ class DiscordNotifier:
         if image_url:
             embed["thumbnail"] = {"url": image_url}
 
-        discord_data = {"embeds": [embed]}
-        return self._send_webhook(discord_data)
+        return self._send_webhook({"embeds": [embed]})
 
     def send_notification(
         self, title: str, message: str, color: int = 0x3498DB
@@ -119,7 +121,3 @@ class DiscordNotifier:
         except requests.exceptions.RequestException as e:
             logger.error(f"Error sending Discord notification: {e}")
             return False
-
-    @staticmethod
-    def _get_timestamp() -> str:
-        return datetime.utcnow().isoformat()

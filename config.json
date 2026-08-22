@@ -94,6 +94,38 @@
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/notebook/",
       "max_pages": 1
+    },
+    {
+      "name": "Sbazar iPhone",
+      "source": "sbazar_cz",
+      "search_term": "iphone",
+      "price_min": 2000,
+      "price_max": 25000,
+      "max_pages": 2
+    },
+    {
+      "name": "Sbazar AirPods",
+      "source": "sbazar_cz",
+      "search_term": "airpods",
+      "price_min": 500,
+      "price_max": 8000,
+      "max_pages": 1
+    },
+    {
+      "name": "Sbazar Lego",
+      "source": "sbazar_cz",
+      "search_term": "lego",
+      "price_min": 200,
+      "price_max": 15000,
+      "max_pages": 1
+    },
+    {
+      "name": "Sbazar PlayStation",
+      "source": "sbazar_cz",
+      "search_term": "playstation",
+      "price_min": 1000,
+      "price_max": 15000,
+      "max_pages": 1
     }
   ]
 }

@@ -8,9 +8,7 @@ from .notifier import DiscordNotifier
 from .scrapers import BazosScraper, Listing
 from .ai_evaluator import AIEvaluator
 
-
 logger = logging.getLogger(__name__)
-
 DEFAULT_INTERVAL_MINUTES = 60
 
 
@@ -19,7 +17,7 @@ class AutoAlertBot:
         self.config = Config(config_path)
         self.database = ListingDatabase(self.config.database_path)
         self.notifier = DiscordNotifier()
-        self.ai_evaluator = AIEvaluator()          # ← nový řádek
+        self.ai_evaluator = AIEvaluator()
         self.scrapers = {
             "bazos_sk": BazosScraper("bazos_sk"),
             "bazos_cz": BazosScraper("bazos_cz"),
@@ -28,7 +26,6 @@ class AutoAlertBot:
 
     def process_listings(self, listings: List[Listing]):
         new_count = 0
-
         for listing in listings:
             if not self.database.is_listing_seen(listing.listing_id, listing.source):
                 self.database.add_listing(
@@ -56,30 +53,29 @@ class AutoAlertBot:
                     location=listing.location or "",
                 )
 
-               if should_notify:
-    # hezčí a výraznější AI hodnocení do Discordu
-    ai_text = f"**🤖 AI hodnocení**\n{reason}"
-    
-    if discount is not None:
-        ai_text += f"\n\n**📉 Sleva proti trhu:** `{discount:.1f} %`"
-    
-    # spojíme s původním popisem (pokud existuje)
-    if listing.description:
-        full_description = f"{listing.description.strip()}\n\n────────────────────\n{ai_text}"
-    else:
-        full_description = ai_text
+                if should_notify:
+                    # hezčí a výraznější AI hodnocení do Discordu
+                    ai_text = f"**🤖 AI hodnocení**\n{reason}"
 
-    self.notifier.send_vehicle_notification(
-        title=listing.title,
-        url=listing.url,
-        price=listing.price,
-        year=getattr(listing, "year", None),
-        mileage=getattr(listing, "mileage", None),
-        location=listing.location,
-        image_url=listing.image_url,
-        description=full_description,
-        color=0x00FF00,  # zelená = dobrý deal
-    )
+                    if discount is not None:
+                        ai_text += f"\n\n**📉 Sleva proti trhu:** `{discount:.1f} %`"
+
+                    # spojíme s původním popisem (pokud existuje)
+                    if listing.description:
+                        full_description = f"{listing.description.strip()}\n\n────────────────────\n{ai_text}"
+                    else:
+                        full_description = ai_text
+
+                    self.notifier.send_vehicle_notification(
+                        title=listing.title,
+                        url=listing.url,
+                        price=listing.price,
+                        year=getattr(listing, "year", None),
+                        mileage=getattr(listing, "mileage", None),
+                        location=listing.location,
+                        image_url=listing.image_url,
+                        description=full_description,
+                        color=0x00FF00,  # zelená = dobrý deal
                     )
                     self.database.mark_as_notified(listing.listing_id, listing.source)
                     new_count += 1
@@ -98,25 +94,21 @@ class AutoAlertBot:
     def run_search_cycle(self):
         """Run one complete search cycle for all configured searches."""
         logger.info("Starting search cycle")
-
         for search_config in self.config.searches:
             source = search_config.get("source")
             if not source:
                 logger.warning(f"Search config missing source: {search_config}")
                 continue
-
             scraper = self.scrapers.get(source)
             if not scraper:
                 logger.warning(f"No scraper available for source: {source}")
                 continue
-
             try:
                 logger.info(
                     f"Scraping {source} with query: {search_config.get('name', 'unnamed')}"
                 )
                 listings = scraper.scrape(search_config)
                 self.process_listings(listings)
-
             except Exception as e:
                 logger.error(f"Error scraping {source}: {e}", exc_info=True)
                 self.notifier.send_notification(
@@ -124,13 +116,11 @@ class AutoAlertBot:
                     message=f"Error scraping {source}: {str(e)}",
                     color=0xFF0000,
                 )
-
         logger.info("Search cycle completed")
 
     def run_once(self):
         """Run one search cycle and exit (for cron/scheduled tasks)."""
         logger.info("Bot starting in run-once mode")
-
         try:
             self.run_search_cycle()
             logger.info("Search cycle completed successfully")
@@ -148,21 +138,17 @@ class AutoAlertBot:
         logger.info(
             f"Bot starting in continuous mode (interval: {DEFAULT_INTERVAL_MINUTES} minutes)"
         )
-
         self.notifier.send_notification(
             title="🚀 Bot Started",
             message=f"Auto Alert Bot is now running. Checking every {DEFAULT_INTERVAL_MINUTES} minutes.",
             color=0x00FF00,
         )
-
         while True:
             try:
                 self.run_search_cycle()
-
                 sleep_seconds = DEFAULT_INTERVAL_MINUTES * 60
                 logger.info(f"Sleeping for {DEFAULT_INTERVAL_MINUTES} minutes")
                 time.sleep(sleep_seconds)
-
             except KeyboardInterrupt:
                 logger.info("Bot stopped by user")
                 self.notifier.send_notification(
@@ -171,7 +157,6 @@ class AutoAlertBot:
                     color=0xFF0000,
                 )
                 break
-
             except Exception as e:
                 logger.error(f"Unexpected error in main loop: {e}", exc_info=True)
                 self.notifier.send_notification(

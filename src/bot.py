@@ -56,24 +56,30 @@ class AutoAlertBot:
                     location=listing.location or "",
                 )
 
-                if should_notify:
-                    # Přidej AI info do notifikace
-                    extra_desc = f"**AI hodnocení:** {reason}"
-                    if discount is not None:
-                        extra_desc += f"\n**Sleva:** {discount:.1f} %"
+               if should_notify:
+    # hezčí a výraznější AI hodnocení do Discordu
+    ai_text = f"**🤖 AI hodnocení**\n{reason}"
+    
+    if discount is not None:
+        ai_text += f"\n\n**📉 Sleva proti trhu:** `{discount:.1f} %`"
+    
+    # spojíme s původním popisem (pokud existuje)
+    if listing.description:
+        full_description = f"{listing.description.strip()}\n\n────────────────────\n{ai_text}"
+    else:
+        full_description = ai_text
 
-                    full_description = (listing.description or "") + "\n\n" + extra_desc
-
-                    self.notifier.send_vehicle_notification(
-                        title=listing.title,
-                        url=listing.url,
-                        price=listing.price,
-                        year=getattr(listing, "year", None),
-                        mileage=getattr(listing, "mileage", None),
-                        location=listing.location,
-                        image_url=listing.image_url,
-                        description=full_description,
-                        color=0x00FF00,  # zelená = dobrý deal
+    self.notifier.send_vehicle_notification(
+        title=listing.title,
+        url=listing.url,
+        price=listing.price,
+        year=getattr(listing, "year", None),
+        mileage=getattr(listing, "mileage", None),
+        location=listing.location,
+        image_url=listing.image_url,
+        description=full_description,
+        color=0x00FF00,  # zelená = dobrý deal
+    )
                     )
                     self.database.mark_as_notified(listing.listing_id, listing.source)
                     new_count += 1

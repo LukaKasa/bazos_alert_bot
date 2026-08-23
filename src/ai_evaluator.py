@@ -73,12 +73,12 @@ KONZOLE + HRY:
 
 PRAVIDLA CENY:
 1. Odhadni realistickou tržní cenu použitého kusu v ČR (2026) pro rychlý prodej na Vinted.
-2. Spočítej slevu (záporné = pod trhem).
+2. discount_percent: ZÁPORNÉ číslo = cena POD trhem (např. -25 znamená 25 % pod trhem). KLADNÉ = nad trhem.
 3. should_buy=true jen pokud:
-   - sleva alespoň cca 10 % pod trhem (u velmi likvidních modelů stačí ~8–10 %)
+   - cena je pod trhem (discount_percent záporné, ideálně ≤ -10, minimum cca -8)
    - věc patří do povolených kategorií
    - není zjevný scam / replika / neexistující model
-4. U silné slevy (>40 %) buď opatrný na podvod, ale pokud model sedí a nabídka působí OK, můžeš doporučit.
+4. U silné slevy (>40 % pod trhem) buď opatrný na podvod, ale pokud model sedí a nabídka působí OK, můžeš doporučit.
 5. Pokud chybí popis: u jasného žádaného modelu (Samba, Dunk, Lego s číslem) můžeš doporučit; jinak buď přísnější.
 
 Odpověz VÝHRADNĚ platným JSON (žádný markdown):
@@ -131,17 +131,26 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                 except (TypeError, ValueError):
                     market_price = None
 
-                if should_buy and discount is not None:
-                    try:
-                        disc = float(discount)
-                        if disc >= 0:
-                            should_buy = False
-                            reason += " (cena není pod trhem)"
-                        elif abs(disc) < 8:
-                            should_buy = False
-                            reason += " (sleva pod 8 %)"
-                    except (TypeError, ValueError):
+                # Přepočet slevy z reálné ceny vs. odhad trhu (AI často vrací špatné znaménko)
+                if market_price and market_price > 0:
+                    real_discount = ((price - market_price) / market_price) * 100.0
+                    discount = round(real_discount, 1)
+
+                if should_buy:
+                    if discount is None:
                         should_buy = False
+                        reason += " (chybí sleva)"
+                    else:
+                        try:
+                            disc = float(discount)
+                            if disc >= 0:
+                                should_buy = False
+                                reason += " (cena není pod trhem)"
+                            elif disc > -8:
+                                should_buy = False
+                                reason += " (sleva pod 8 %)"
+                        except (TypeError, ValueError):
+                            should_buy = False
 
                 logger.info(
                     f"Gemini eval: {title[:55]}... → buy={should_buy}, "

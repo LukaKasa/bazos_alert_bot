@@ -2,36 +2,19 @@
   "database_path": "./data/listings.db",
   "searches": [
     {
-      "name": "Nike tenisky top",
+      "name": "Nike tenisky",
       "source": "bazos_cz",
-      "search_term": "Air Force OR Dunk OR Jordan OR Blazer OR Cortez",
+      "url": "https://obleceni.bazos.cz/inzeraty/nike/",
       "price_min": 500,
       "price_max": 8000,
       "max_pages": 2
     },
     {
-      "name": "Adidas tenisky top",
-      "source": "bazos_cz",
-      "search_term": "Samba OR Gazelle OR Campus OR Spezial OR Ultraboost OR Superstar OR \"Stan Smith\" OR Handball",
-      "price_min": 400,
-      "price_max": 6000,
-      "max_pages": 2
-    },
-    {
-      "name": "Nike / Adidas vintage + streetwear",
-      "source": "bazos_cz",
-      "search_term": "Nike OR Adidas",
-      "url": "https://obleceni.bazos.cz/inzeraty/nike/",
-      "price_min": 200,
-      "price_max": 5000,
-      "max_pages": 2
-    },
-    {
-      "name": "Adidas oblečení / vintage",
+      "name": "Adidas tenisky / vintage",
       "source": "bazos_cz",
       "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
-      "price_min": 200,
-      "price_max": 5000,
+      "price_min": 400,
+      "price_max": 6000,
       "max_pages": 2
     },
     {
@@ -75,11 +58,21 @@
       "max_pages": 2
     },
     {
-      "name": "Sbazar Nike / Adidas tenisky",
+      "name": "Sbazar Nike",
       "source": "sbazar_cz",
-      "search_term": "nike dunk OR jordan OR samba OR gazelle OR campus",
+      "search_term": "nike",
       "price_min": 500,
       "price_max": 8000,
+      "max_pages": 2,
+      "fetch_details": true,
+      "max_details": 20
+    },
+    {
+      "name": "Sbazar Adidas",
+      "source": "sbazar_cz",
+      "search_term": "adidas",
+      "price_min": 400,
+      "price_max": 6000,
       "max_pages": 2,
       "fetch_details": true,
       "max_details": 20
@@ -95,11 +88,21 @@
       "max_details": 20
     },
     {
-      "name": "Sbazar PlayStation / Nintendo",
+      "name": "Sbazar PlayStation",
       "source": "sbazar_cz",
-      "search_term": "playstation OR nintendo switch",
+      "search_term": "playstation",
       "price_min": 1000,
       "price_max": 15000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 15
+    },
+    {
+      "name": "Sbazar Nintendo",
+      "source": "sbazar_cz",
+      "search_term": "nintendo switch",
+      "price_min": 1500,
+      "price_max": 12000,
       "max_pages": 1,
       "fetch_details": true,
       "max_details": 15

@@ -2,51 +2,66 @@
   "database_path": "./data/listings.db",
   "searches": [
     {
-      "name": "iPhone Ostrava",
+      "name": "Nike tenisky top",
       "source": "bazos_cz",
-      "url": "https://mobil.bazos.cz/inzeraty/iphone/ostrava/",
+      "search_term": "Air Force OR Dunk OR Jordan OR Blazer OR Cortez",
+      "price_min": 500,
+      "price_max": 8000,
       "max_pages": 2
     },
     {
-      "name": "iPhone obecně",
+      "name": "Adidas tenisky top",
       "source": "bazos_cz",
-      "url": "https://mobil.bazos.cz/inzeraty/iphone/",
+      "search_term": "Samba OR Gazelle OR Campus OR Spezial OR Ultraboost OR Superstar OR \"Stan Smith\" OR Handball",
+      "price_min": 400,
+      "price_max": 6000,
       "max_pages": 2
     },
     {
-      "name": "AirPods",
+      "name": "Nike / Adidas vintage + streetwear",
       "source": "bazos_cz",
-      "url": "https://mobil.bazos.cz/inzeraty/airpods/",
+      "search_term": "Nike OR Adidas",
+      "url": "https://obleceni.bazos.cz/inzeraty/nike/",
+      "price_min": 200,
+      "price_max": 5000,
       "max_pages": 2
     },
     {
-      "name": "Apple Watch",
+      "name": "Adidas oblečení / vintage",
       "source": "bazos_cz",
-      "url": "https://mobil.bazos.cz/inzeraty/apple-watch/",
+      "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
+      "price_min": 200,
+      "price_max": 5000,
       "max_pages": 2
     },
     {
-      "name": "iPad",
+      "name": "Lego sety",
       "source": "bazos_cz",
-      "url": "https://pc.bazos.cz/inzeraty/ipad/",
-      "max_pages": 1
+      "url": "https://deti.bazos.cz/inzeraty/lego/",
+      "price_min": 150,
+      "price_max": 15000,
+      "max_pages": 2
     },
     {
       "name": "PlayStation konzole",
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/inzeraty/playstation/",
+      "price_min": 800,
+      "price_max": 15000,
       "max_pages": 2
     },
     {
       "name": "Nintendo Switch konzole",
       "source": "bazos_cz",
       "url": "https://pc.bazos.cz/inzeraty/nintendo/",
+      "price_min": 1500,
+      "price_max": 12000,
       "max_pages": 2
     },
     {
       "name": "Žádané hry Nintendo",
       "source": "bazos_cz",
-      "search_term": "Mario OR Zelda OR \"Animal Crossing\" OR \"Super Smash\" OR Kart OR Odyssey OR \"Breath of the Wild\" OR \"Tears of the Kingdom\"",
+      "search_term": "Mario OR Zelda OR \"Animal Crossing\" OR \"Super Smash\" OR Odyssey OR \"Breath of the Wild\" OR \"Tears of the Kingdom\" OR Pokemon",
       "price_min": 300,
       "price_max": 2500,
       "max_pages": 2
@@ -54,78 +69,40 @@
     {
       "name": "Žádané hry PlayStation",
       "source": "bazos_cz",
-      "search_term": "\"God of War\" OR \"Spider-Man\" OR \"Horizon\" OR \"The Last of Us\" OR \"Ghost of Tsushima\" OR \"Red Dead\" OR GTA OR \"Call of Duty\"",
+      "search_term": "\"God of War\" OR \"Spider-Man\" OR Horizon OR \"The Last of Us\" OR \"Ghost of Tsushima\" OR \"Red Dead\" OR GTA OR \"Call of Duty\"",
       "price_min": 200,
       "price_max": 2000,
       "max_pages": 2
     },
     {
-      "name": "Lego",
-      "source": "bazos_cz",
-      "url": "https://deti.bazos.cz/inzeraty/lego/",
-      "max_pages": 2
-    },
-    {
-      "name": "Pokémon",
-      "source": "bazos_cz",
-      "url": "https://ostatni.bazos.cz/inzeraty/pokemon/",
-      "max_pages": 2
-    },
-    {
-      "name": "Nike tenisky",
-      "source": "bazos_cz",
-      "url": "https://obleceni.bazos.cz/inzeraty/nike/",
-      "max_pages": 2
-    },
-    {
-      "name": "Adidas tenisky",
-      "source": "bazos_cz",
-      "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
-      "max_pages": 2
-    },
-    {
-      "name": "Šperky zlato/stříbro",
-      "source": "bazos_cz",
-      "url": "https://ostatni.bazos.cz/inzeraty/sperky/",
-      "max_pages": 2
-    },
-    {
-      "name": "Notebooky",
-      "source": "bazos_cz",
-      "url": "https://pc.bazos.cz/notebook/",
-      "max_pages": 1
-    },
-    {
-      "name": "Sbazar iPhone",
+      "name": "Sbazar Nike / Adidas tenisky",
       "source": "sbazar_cz",
-      "search_term": "iphone",
-      "price_min": 2000,
-      "price_max": 25000,
-      "max_pages": 2
-    },
-    {
-      "name": "Sbazar AirPods",
-      "source": "sbazar_cz",
-      "search_term": "airpods",
+      "search_term": "nike dunk OR jordan OR samba OR gazelle OR campus",
       "price_min": 500,
       "price_max": 8000,
-      "max_pages": 1
+      "max_pages": 2,
+      "fetch_details": true,
+      "max_details": 20
     },
     {
       "name": "Sbazar Lego",
       "source": "sbazar_cz",
       "search_term": "lego",
-      "price_min": 200,
-      "price_max": 15000,
-      "max_pages": 1
+      "price_min": 150,
+      "price_max": 12000,
+      "max_pages": 2,
+      "fetch_details": true,
+      "max_details": 20
     },
     {
-      "name": "Sbazar PlayStation",
+      "name": "Sbazar PlayStation / Nintendo",
       "source": "sbazar_cz",
-      "search_term": "playstation",
+      "search_term": "playstation OR nintendo switch",
       "price_min": 1000,
       "price_max": 15000,
-      "max_pages": 1
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 15
     }
   ]
 }

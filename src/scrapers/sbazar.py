@@ -36,15 +36,17 @@ class SbazarScraper(BaseScraper):
             self.logger.error("Sbazar: chybí search_term")
             return []
 
-        # Pokud je URL typu https://www.sbazar.cz/hledat/iphone → vezmi poslední část
         if search_config.get("url") and not search_config.get("search_term"):
             url = search_config["url"].rstrip("/")
             phrase = url.split("/")[-1] if "/hledat/" in url else phrase
 
         max_pages = search_config.get("max_pages", 1)
-        limit = 20  # API default page size
+        limit = 20
         price_min = search_config.get("price_min")
         price_max = search_config.get("price_max")
+        # Kolik detailů max stáhnout (popis) – šetří API
+        fetch_details = search_config.get("fetch_details", True)
+        max_details = int(search_config.get("max_details", 25))
 
         all_listings: List[Listing] = []
 
@@ -59,7 +61,6 @@ class SbazarScraper(BaseScraper):
                 "offset": offset,
                 "phrase": phrase,
             }
-            # API podporuje i category – zatím stačí phrase
 
             try:
                 resp = self.session.get(
@@ -88,13 +89,46 @@ class SbazarScraper(BaseScraper):
 
             self.logger.info(f"Found {len(results)} listings on page {page + 1}")
 
-            # Anti-bot pauza mezi stránkami
             if page < max_pages - 1:
                 delay = random.uniform(2.5, 5.5)
                 time.sleep(delay)
 
+        # Doplnění popisů z detailu (kvůli AI)
+        if fetch_details and all_listings:
+            self._enrich_with_details(all_listings[:max_details])
+
         self.logger.info(f"Total Sbazar listings found: {len(all_listings)}")
         return all_listings
+
+    def _enrich_with_details(self, listings: List[Listing]) -> None:
+        """Stáhne popis z detail endpointu pro lepší AI hodnocení."""
+        for i, listing in enumerate(listings):
+            try:
+                resp = self.session.get(
+                    f"{self.API_BASE}/adverts/{listing.listing_id}",
+                    timeout=20,
+                )
+                if resp.status_code != 200:
+                    continue
+                data = resp.json()
+                result = data.get("result") or {}
+                desc = (result.get("description") or "").strip()
+                if desc:
+                    listing.description = desc[:500]
+                # pokud chybí obrázek, zkus doplnit
+                if not listing.image_url:
+                    images = result.get("images") or []
+                    if images:
+                        img = images[0].get("url") or ""
+                        if img.startswith("//"):
+                            listing.image_url = "https:" + img
+                        elif img.startswith("http"):
+                            listing.image_url = img
+            except Exception as e:
+                self.logger.debug(f"Sbazar detail failed for {listing.listing_id}: {e}")
+
+            if i < len(listings) - 1:
+                time.sleep(random.uniform(0.8, 1.8))
 
     def _parse_item(
         self,
@@ -116,7 +150,6 @@ class SbazarScraper(BaseScraper):
             else:
                 price = "N/A"
 
-            # Filtr ceny (pokud je nastavený)
             if price_val is not None:
                 try:
                     p = int(price_val)
@@ -130,13 +163,11 @@ class SbazarScraper(BaseScraper):
             seo = item.get("seo_name") or listing_id
             url = f"https://www.sbazar.cz/inzerat/{seo}"
 
-            # Lokalita
             loc = item.get("locality") or {}
             city = loc.get("municipality") or loc.get("district") or ""
             zip_code = loc.get("zip") or ""
-            location = f"{city}, {zip_code}".strip(", ") if city or zip_code else city or None
+            location = f"{city}, {zip_code}".strip(", ") if city or zip_code else (city or None)
 
-            # Obrázek
             image_url = None
             images = item.get("images") or []
             if images:
@@ -161,7 +192,7 @@ class SbazarScraper(BaseScraper):
                 price=price,
                 location=location,
                 image_url=image_url,
-                description=None,  # detail lze doplnit později
+                description=None,
                 category=category,
                 date_posted=date_posted,
                 view_count=None,

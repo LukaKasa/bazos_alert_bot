@@ -14,7 +14,10 @@ class AIEvaluator:
     def __init__(self):
         self.api_key = os.environ.get("GEMINI_API_KEY")
         self.model = "gemini-3.5-flash-lite"
-        self.base_url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        self.base_url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{self.model}:generateContent"
+        )
 
     def evaluate_deal(
         self,
@@ -33,8 +36,8 @@ class AIEvaluator:
 
         price = int(price_clean)
 
-        prompt = f"""Jsi přísný expert na český a slovenský bazarový trh (Bazoš → Vinted + Facebook Marketplace) v roce 2026.
-Specializuješ se na rychlý flipping s vysokou likviditou. Posíláš notifikace POUZE u opravdu zajímavých a důvěryhodných nabídek.
+        prompt = f"""Jsi přísný expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
+Cíl: koupit pod cenou a prodat do 1–7 dní. Posílej notifikace POUZE u vysoce likvidních věcí.
 
 Nabídka:
 - Titulek: {title}
@@ -42,55 +45,48 @@ Nabídka:
 - Lokalita: {location or "neznámá"}
 - Popis: {(description or "bez popisu")[:550]}
 
-ZÁKLADNÍ PRAVIDLA:
-1. Odhadni realistickou tržní cenu použitého kusu v dobrém stavu v ČR/SK (2026).
-2. Spočítej slevu (záporné číslo = pod trhem).
-3. Doporuč koupit POUZE pokud je sleva 8–50 % pod trhem A nabídka je atraktivní + důvěryhodná.
-4. Pokud chybí popis, buď opatrnější, ale u jasného žádaného modelu (iPhone, Samba, Lego set s číslem) můžeš doporučit, pokud cena dává smysl.
+POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
+1) Tenisky – jen žádané siluety
+2) Vintage / streetwear Nike a Adidas (mikiny, bundy, tepláky, dresy – ne obyčejné sportovní kalhoty)
+3) Lego – konkrétní sety s číslem (ne bulk kg bez specifikace)
+4) Herní konzole (PS4/PS5, Nintendo Switch) + žádané hry
 
-PŘÍSNÁ PRAVIDLA PODLE KATEGORIE:
+TENISKY – whitelist:
+- Nike: Air Force 1, Dunk Low/High, Jordan 1, Jordan 4, Blazer, Cortez
+- Adidas: Samba, Gazelle, Campus, Spezial, Handball Spezial, Ultraboost, Superstar, Stan Smith
+- Odmítni: Revolution, VS Pace, generic běžecké, neznámé collaby, dětské kopačky, repliky
 
-**Konzole (Nintendo Switch / PlayStation):**
-- Preferuj kompletní sety (krabice, kabely, alespoň 1 ovladač).
-- Switch OLED je žádanější než klasický V1/V2.
-- Samostatné levné hry (Just Dance, sportovní, méně žádané tituly) → VŽDY odmítnout.
+VINTAGE / STREETWEAR Nike–Adidas:
+- Preferuj: starší mikiny, bundy, dresy, tepláky s dobrým stavem a velikostí
+- Odmítni: běžné nové sportovní kalhoty, ponožky, čepice bez hodnoty, dětské low-end
 
-**Hry:**
-- Posílej POUZE žádané tituly: Mario, Zelda, Animal Crossing, Super Smash, Pokémon (hry), God of War, Spider-Man, Horizon, The Last of Us, Ghost of Tsushima, GTA, Call of Duty atd.
-- Levné / méně žádané hry → odmítnout.
+LEGO:
+- Preferuj: set s číslem (Star Wars, Technic, Icons, Minecraft, Harry Potter, Creator, City konkrétní set)
+- Nové/nerozbalené = bonus
+- Odmítni: bulk kg bez obsahu, nekompletní bez čísla, čínské kopie
 
-**Tenisky (Nike / Adidas):**
-- Posílej POUZE žádané modely:
-  • Nike: Air Force 1, Dunk Low/High, Jordan 1, Jordan 4, Blazer, Cortez
-  • Adidas: Samba, Gazelle, Campus, Spezial, Ultraboost, Superstar, Stan Smith, Handball Spezial
-- Méně žádané (Kamanda, starší běžecké, neznámé collaby) → VŽDY odmítnout.
+KONZOLE + HRY:
+- Konzole: ideálně s ovladačem/kabely
+- Hry jen žádané: Mario, Zelda, Animal Crossing, Smash, Odyssey, BOTW/TOTK, Pokémon;
+  God of War, Spider-Man, Horizon, TLOU, Ghost of Tsushima, RDR, GTA, CoD
+- Odmítni: Just Dance, levné sportovní, neznámé low-demand tituly, čínské handheldy
 
-**iPhone / AirPods / Apple Watch / iPad:**
-- iPhone: kondice baterie ideálně 85 %+.
-- AirPods: u velmi nízkých cen opatrně na padělky.
+PRAVIDLA CENY:
+1. Odhadni realistickou tržní cenu použitého kusu v ČR (2026) pro rychlý prodej na Vinted.
+2. Spočítej slevu (záporné = pod trhem).
+3. should_buy=true jen pokud:
+   - sleva alespoň cca 10 % pod trhem (u velmi likvidních modelů stačí ~8–10 %)
+   - věc patří do povolených kategorií
+   - není zjevný scam / replika / neexistující model
+4. U silné slevy (>40 %) buď opatrný na podvod, ale pokud model sedí a nabídka působí OK, můžeš doporučit.
+5. Pokud chybí popis: u jasného žádaného modelu (Samba, Dunk, Lego s číslem) můžeš doporučit; jinak buď přísnější.
 
-**Lego:**
-- Preferuj kompletní / nové sety, Star Wars, Technic, Icons, Harry Potter, Duplo konkrétní sety.
-- Bulk bez specifikace → odmítnout.
-
-**Pokémon karty:**
-- Preferuj graded nebo moderní žádané sety / rare karty.
-- Bulk běžných karet → odmítnout.
-
-**Šperky:**
-- Hlavně zlato a stříbro. Podezřele levné = opatrnost.
-
-**Obecně odmítni:**
-- Podezřelé formulace, stock fotky + podezřele nízká cena
-- Neexistující / budoucí modely
-- Jednotlivé levné hry a low-demand věci
-
-Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
+Odpověz VÝHRADNĚ platným JSON (žádný markdown):
 {{
   "market_price_estimate": číslo,
   "discount_percent": číslo,
   "should_buy": true/false,
-  "reason": "krátké zdůvodnění česky (1-2 věty)."
+  "reason": "1–2 věty česky: proč koupit / proč ne, včetně odhadu trhu."
 }}
 """
 
@@ -106,20 +102,19 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
         }
 
         last_error = None
-        for attempt in range(2):  # 1. pokus + 1 retry
+        for attempt in range(2):
             try:
                 response = requests.post(
                     self.base_url,
                     headers=headers,
                     params=params,
                     json=payload,
-                    timeout=55,  # delší timeout
+                    timeout=55,
                 )
                 response.raise_for_status()
                 data = response.json()
 
                 content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-
                 if content.startswith("```"):
                     content = re.sub(r"^```(?:json)?\n?", "", content)
                     content = re.sub(r"\n?```$", "", content)
@@ -139,8 +134,6 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
                 if should_buy and discount is not None:
                     try:
                         disc = float(discount)
-                        # Povolit i silnější slevy, pokud AI řekla should_buy
-                        # (ochrana jen proti absurdním kladným "slevám")
                         if disc >= 0:
                             should_buy = False
                             reason += " (cena není pod trhem)"
@@ -151,9 +144,9 @@ Odpověz VÝHRADNĚ platným JSON objektem (žádný markdown):
                         should_buy = False
 
                 logger.info(
-                    f"Gemini eval: {title[:55]}... → buy={should_buy}, discount={discount}%, market={market_price}, reason={reason}"
+                    f"Gemini eval: {title[:55]}... → buy={should_buy}, "
+                    f"discount={discount}%, market={market_price}, reason={reason}"
                 )
-
                 time.sleep(1.5)
                 return should_buy, reason, discount, market_price
 

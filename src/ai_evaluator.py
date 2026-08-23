@@ -36,8 +36,8 @@ class AIEvaluator:
 
         price = int(price_clean)
 
-        prompt = f"""Jsi přísný expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
-Cíl: koupit pod cenou a prodat do 1–7 dní. Posílej notifikace POUZE u vysoce likvidních věcí.
+        prompt = f"""Jsi PŘÍSNÝ expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
+Cíl: koupit pod cenou a prodat do 1–7 dní. Notifikuj POUZE vysoce likvidní věci.
 
 Nabídka:
 - Titulek: {title}
@@ -46,47 +46,48 @@ Nabídka:
 - Popis: {(description or "bez popisu")[:550]}
 
 POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
-1) Tenisky – jen žádané siluety
-2) Vintage / streetwear Nike a Adidas (mikiny, bundy, tepláky, dresy – ne obyčejné sportovní kalhoty)
-3) Lego – konkrétní sety s číslem (ne bulk kg bez specifikace)
-4) Herní konzole (PS4/PS5, Nintendo Switch) + žádané hry
+1) Tenisky – JEN whitelist siluet níže
+2) Vintage / streetwear Nike a Adidas (mikiny, bundy, dresy, tepláky – ne obyčejné sportovní kalhoty)
+3) Lego – konkrétní sety s číslem (ne bulk kg)
+4) Herní konzole PS4/PS5/Nintendo Switch (OLED/Lite) + žádané hry pro tyto platformy
 
-TENISKY – whitelist:
-- Nike: Air Force 1, Dunk Low/High, Jordan 1, Jordan 4, Blazer, Cortez
+TENISKY – whitelist (pouze tyto):
+- Nike: Air Force 1, Dunk Low, Dunk High, Jordan 1, Jordan 4, Blazer, Cortez
 - Adidas: Samba, Gazelle, Campus, Spezial, Handball Spezial, Ultraboost, Superstar, Stan Smith
-- Odmítni: Revolution, VS Pace, generic běžecké, neznámé collaby, dětské kopačky, repliky
+ODMÍTNI vždy: Revolution, VS Pace, Air Max (kromě kolaborací co nejsou na whitelistu), Huarache, Monarch, Satire,
+ACG, Terrex, trail/outdoor boty, kopačky, sálovky, dětské boty, generické "Nike Air", low-end běžecké.
 
-VINTAGE / STREETWEAR Nike–Adidas:
-- Preferuj: starší mikiny, bundy, dresy, tepláky s dobrým stavem a velikostí
-- Odmítni: běžné nové sportovní kalhoty, ponožky, čepice bez hodnoty, dětské low-end
+VINTAGE / STREETWEAR:
+- Preferuj: starší mikiny, bundy, dresy s dobrým stavem
+- Odmítni: obyčejné fleecové mikiny, ponožky, čepice, dětské low-end, nové levné sportovní kalhoty
 
 LEGO:
-- Preferuj: set s číslem (Star Wars, Technic, Icons, Minecraft, Harry Potter, Creator, City konkrétní set)
-- Nové/nerozbalené = bonus
-- Odmítni: bulk kg bez obsahu, nekompletní bez čísla, čínské kopie
+- Preferuj: set s číslem (Star Wars, Technic, Icons, Minecraft, Harry Potter, Creator, City)
+- Odmítni: bulk bez čísla, Duplo na váhu, CHEVA, nekompletní bez figurek
 
 KONZOLE + HRY:
-- Konzole: ideálně s ovladačem/kabely
-- Hry jen žádané: Mario, Zelda, Animal Crossing, Smash, Odyssey, BOTW/TOTK, Pokémon;
-  God of War, Spider-Man, Horizon, TLOU, Ghost of Tsushima, RDR, GTA, CoD
-- Odmítni: Just Dance, levné sportovní, neznámé low-demand tituly, čínské handheldy
+- POVOLENO: PS4, PS5, Nintendo Switch (včetně OLED/Lite), Switch 2 pokud reálně existuje a cena dává smysl
+- POVOLENÉ HRY: Mario, Zelda, Animal Crossing, Smash, Odyssey, BOTW, TOTK, Pokémon,
+  God of War, Spider-Man, Horizon, The Last of Us, Ghost of Tsushima, RDR, GTA, Call of Duty
+- ODMÍTNI VŽDY: Nintendo Wii, Wii U, hry na Wii/Wii U, Just Dance, Fifa samotná bez konzole,
+  levné sportovní tituly, neznámé low-demand hry, čínské handheldy, samotné příslušenství bez konzole
 
 PRAVIDLA CENY:
 1. Odhadni realistickou tržní cenu použitého kusu v ČR (2026) pro rychlý prodej na Vinted.
-2. discount_percent: ZÁPORNÉ číslo = cena POD trhem (např. -25 znamená 25 % pod trhem). KLADNÉ = nad trhem.
-3. should_buy=true jen pokud:
-   - cena je pod trhem (discount_percent záporné, ideálně ≤ -10, minimum cca -8)
-   - věc patří do povolených kategorií
-   - není zjevný scam / replika / neexistující model
-4. U silné slevy (>40 % pod trhem) buď opatrný na podvod, ale pokud model sedí a nabídka působí OK, můžeš doporučit.
-5. Pokud chybí popis: u jasného žádaného modelu (Samba, Dunk, Lego s číslem) můžeš doporučit; jinak buď přísnější.
+2. discount_percent: ZÁPORNÉ = pod trhem (např. -25 = 25 % pod). KLADNÉ = nad trhem.
+3. should_buy=true JEN pokud:
+   - cena je pod trhem (discount ≤ -10, minimum -8 u top modelů)
+   - věc je v povolených kategoriích a na whitelistu
+   - není scam / replika / neexistující model
+4. U slevy >40 % pod trhem buď opatrný (scam), ale u jasného modelu můžeš doporučit.
+5. Bez popisu: u jasného žádaného modelu (Samba, Dunk, Lego s číslem, Switch) můžeš doporučit; jinak přísněji.
 
 Odpověz VÝHRADNĚ platným JSON (žádný markdown):
 {{
   "market_price_estimate": číslo,
   "discount_percent": číslo,
   "should_buy": true/false,
-  "reason": "1–2 věty česky: proč koupit / proč ne, včetně odhadu trhu."
+  "reason": "1–2 věty česky: proč koupit / proč ne."
 }}
 """
 
@@ -95,14 +96,14 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
-                "temperature": 0.12,
+                "temperature": 0.1,
                 "maxOutputTokens": 500,
                 "responseMimeType": "application/json",
             },
         }
 
         last_error = None
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 response = requests.post(
                     self.base_url,
@@ -111,6 +112,17 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                     json=payload,
                     timeout=55,
                 )
+
+                # Ochrana proti 429 – počkej a zkus znovu
+                if response.status_code == 429:
+                    wait = 20 + (attempt * 15)
+                    logger.warning(
+                        f"Gemini 429 rate limit (attempt {attempt + 1}/3), čekám {wait}s"
+                    )
+                    time.sleep(wait)
+                    last_error = Exception("429 Too Many Requests")
+                    continue
+
                 response.raise_for_status()
                 data = response.json()
 
@@ -131,7 +143,7 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                 except (TypeError, ValueError):
                     market_price = None
 
-                # Přepočet slevy z reálné ceny vs. odhad trhu (AI často vrací špatné znaménko)
+                # Přepočet slevy (AI často vrací špatné znaménko)
                 if market_price and market_price > 0:
                     real_discount = ((price - market_price) / market_price) * 100.0
                     discount = round(real_discount, 1)
@@ -156,17 +168,18 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                     f"Gemini eval: {title[:55]}... → buy={should_buy}, "
                     f"discount={discount}%, market={market_price}, reason={reason}"
                 )
-                time.sleep(1.5)
+                # Delší pauza proti rate limitu
+                time.sleep(3.0)
                 return should_buy, reason, discount, market_price
 
             except requests.exceptions.Timeout as e:
                 last_error = e
-                logger.warning(f"Gemini timeout (attempt {attempt + 1}/2): {e}")
-                time.sleep(2.5)
+                logger.warning(f"Gemini timeout (attempt {attempt + 1}/3): {e}")
+                time.sleep(5 + attempt * 3)
             except Exception as e:
                 last_error = e
                 logger.error(f"Gemini evaluation failed: {e}")
-                time.sleep(2.0)
+                time.sleep(3.0)
                 break
 
         return False, f"Chyba Gemini: {str(last_error)[:130]}", None, None

@@ -37,7 +37,7 @@ class AIEvaluator:
         price = int(price_clean)
 
         prompt = f"""Jsi PŘÍSNÝ a KONZERVATIVNÍ expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
-Cíl: koupit pod cenou a prodat do 1–7 dní. Notifikuj POUZE reálně výhodné a likvidní věci.
+Cíl: koupit pod cenou a prodat do 1–7 dní. Notifikuj POUZE reálně výhodné věci z povolených kategorií.
 
 Nabídka:
 - Titulek: {title}
@@ -45,63 +45,55 @@ Nabídka:
 - Lokalita: {location or "neznámá"}
 - Popis: {(description or "bez popisu")[:550]}
 
-=== ODHA TRŽNÍ CENY (KRITICKÉ – BUĎ KONZERVATIVNÍ) ===
-market_price_estimate = cena, za kterou se to v ČR REÁLNĚ prodá na Vinted/FB do 7 dnů, NE:
-- nová maloobchodní cena
-- ideální „sběratelská“ cena
-- evropský průměr BrickLink bez dopravy
-- cena za kus ve perfektním stavu s krabicí, pokud to inzerát nemá
+=== ODHA TRŽNÍ CENY (KONZERVATIVNÍ) ===
+market_price_estimate = cena, za kterou se to v ČR REÁLNĚ prodá na Vinted/FB do 7 dnů.
+NE nová maloobchodní cena, NE ideální sběratelská cena, NE EU průměr.
 
-Pravidla odhadu:
-1. Vždy počítej s použitým stavem, běžným opotřebením, chybějící krabicí a lokální konkurencí v ČR.
+Pravidla:
+1. Počítej s použitým stavem, opotřebením, chybějící krabicí a konkurencí v ČR.
 2. Když si nejsi jistý, sniž odhad o 15–25 %.
-3. U konzolí bez her/příslušenství sniž odhad. U her samotných buď přísný.
-4. U tenisek bez krabice / nošených sniž odhad. Repliky a podezřelé collaby = should_buy false.
-5. U Lega: nekompletní, bez figurek, bulk bez čísla = nízká cena nebo reject.
-6. Raději podstřel trh než přestřel – lepší minout slabý deal než poslat falešný „good deal“.
+3. Raději podstřel trh než přestřel.
+4. Podezřele levné telefony/notebooky bez popisu baterie/iCloud = vysoké riziko podvodu → should_buy false.
 
 POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
-1) Tenisky – JEN whitelist níže
-2) Vintage / streetwear Nike a Adidas (mikiny, bundy, dresy – ne obyčejné fleecové mikiny)
-3) Lego – konkrétní sety s číslem
-4) Konzole PS4/PS5/Nintendo Switch (OLED/Lite) + žádané hry pro tyto platformy
 
-TENISKY – whitelist:
-- Nike: Air Force 1, Dunk Low, Dunk High, Jordan 1, Jordan 4, Blazer, Cortez
-- Adidas: Samba, Gazelle, Campus, Spezial, Handball Spezial, Ultraboost, Superstar, Stan Smith
-ODMÍTNI: Revolution, VS Pace, Huarache, Monarch, Satire, ACG, Terrex, trail/outdoor,
-kopačky, sálovky, dětské boty, generické „Nike Air“, low-end běžecké, většinu Air Max mimo whitelist.
+1) SBĚRATELSKÉ / ŽÁDANÉ TENISKY A DOPLŇKY
+- Nike: Air Force 1, Dunk, Jordan 1, Jordan 4, Blazer, Cortez, žádané collaby
+- Jordan (samostatně i Nike Jordan)
+- Adidas: Samba, Gazelle, Campus, Spezial, Handball Spezial, Ultraboost, Superstar, Stan Smith, žádané collaby
+- DC Shoes: žádané skate siluety (Court Graffik, Legacy, pure apod.) v dobrém stavu
+- New Era: originální kšiltovky 59FIFTY / 9FORTY (ne no-name)
+ODMÍTNI: Revolution, VS Pace, generické běžecké, kopačky, dětské low-end, jasné repliky
 
-VINTAGE / STREETWEAR:
-- Preferuj: starší mikiny, bundy, dresy v dobrém stavu
-- Odmítni: obyčejné fleecové mikiny, ponožky, čepice, dětské low-end
+2) iPhone – POUZE řady 14, 15, 16 (včetně Plus / Pro / Pro Max / mini kde dává smysl)
+- ODMÍTNI: iPhone 13 a starší, SE, nejasný model, extrémně nízká cena bez baterie/popisu (scam)
+- Sleduj: % baterie, iCloud lock, Face ID, stav displeje
 
-LEGO:
-- Preferuj: set s číslem (Star Wars, Technic, Icons, Minecraft, Harry Potter, Creator, City)
-- Odmítni: bulk bez čísla, Duplo na váhu, CHEVA, nekompletní bez figurek
+3) MacBook
+- Air / Pro – preferuj Apple Silicon (M1/M2/M3/M4) pokud je v popisu
+- ODMÍTNI: mrtvé kusy, silně poškozené, podezřele levné bez specifikace
+- Sleduj: rok/čip/RAM/SSD pokud jsou uvedené
 
-KONZOLE + HRY:
-- POVOLENO: PS4, PS5, Nintendo Switch (OLED/Lite)
-- HRY: Mario, Zelda, Animal Crossing, Smash, Odyssey, BOTW, TOTK, Pokémon,
-  God of War, Spider-Man, Horizon, The Last of Us, Ghost of Tsushima, RDR, GTA, CoD
-- ODMÍTNI: Wii, Wii U, hry na Wii/Wii U, Just Dance, samotné Fifa, low-demand tituly,
-  čínské handheldy, samotné příslušenství bez konzole
+4) SBĚRATELSKÉ LEGO
+- Konkrétní set s číslem (Star Wars, Technic, Icons, Creator Expert, Modular, žádané City/Minecraft/HP)
+- Nové/nerozbalené = bonus
+- ODMÍTNI: bulk kg bez čísla, Duplo na váhu, CHEVA, nekompletní bez figurek, čínské kopie
 
 PRAVIDLA ROZHODNUTÍ:
-1. Spočítej slevu: záporné % = pod trhem (např. -20 = 20 % pod).
+1. discount_percent: záporné = pod trhem (např. -20 = 20 % pod).
 2. should_buy=true JEN pokud:
-   - cena je pod KONZERVATIVNÍM odhadem trhu (ideálně ≤ -12 %, minimum cca -10 %)
-   - věc je v povolených kategoriích
-   - není scam / replika / neexistující model
-3. U slevy >35 % pod trhem buď velmi opatrný (často podvod) – doporuč jen při jasné důvěryhodnosti.
-4. Bez popisu: u jasného žádaného modelu můžeš doporučit, ale s ještě konzervativnějším trhem; jinak reject.
+   - cena je pod konzervativním trhem (ideálně ≤ -12 %, minimum cca -10 %)
+   - kategorie je povolená
+   - není scam / replika / špatný model iPhonu
+3. U slevy >35 % u telefonů a MacBooků buď velmi opatrný.
+4. Bez popisu: u jasného modelu tenisky/Lego s číslem možné; u iPhone/MacBook spíš reject.
 
 Odpověz VÝHRADNĚ platným JSON (žádný markdown):
 {{
   "market_price_estimate": číslo,
   "discount_percent": číslo,
   "should_buy": true/false,
-  "reason": "1–2 věty česky: proč koupit / proč ne, s důrazem na reálnou prodejní cenu v ČR."
+  "reason": "1–2 věty česky: proč koupit / proč ne."
 }}
 """
 
@@ -156,7 +148,7 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                 except (TypeError, ValueError):
                     market_price = None
 
-                # Konzervativní korekce: AI občas stále přestřelí → mírně stáhneme odhad
+                # Konzervativní korekce trhu (−8 %)
                 if market_price and market_price > 0:
                     market_price = int(round(market_price * 0.92))
                     real_discount = ((price - market_price) / market_price) * 100.0

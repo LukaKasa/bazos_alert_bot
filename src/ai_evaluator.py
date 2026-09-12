@@ -36,8 +36,8 @@ class AIEvaluator:
 
         price = int(price_clean)
 
-        prompt = f"""Jsi PŘÍSNÝ expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
-Cíl: koupit pod cenou a prodat do 1–7 dní. Notifikuj POUZE vysoce likvidní věci.
+        prompt = f"""Jsi PŘÍSNÝ a KONZERVATIVNÍ expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
+Cíl: koupit pod cenou a prodat do 1–7 dní. Notifikuj POUZE reálně výhodné a likvidní věci.
 
 Nabídka:
 - Titulek: {title}
@@ -45,49 +45,63 @@ Nabídka:
 - Lokalita: {location or "neznámá"}
 - Popis: {(description or "bez popisu")[:550]}
 
-POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
-1) Tenisky – JEN whitelist siluet níže
-2) Vintage / streetwear Nike a Adidas (mikiny, bundy, dresy, tepláky – ne obyčejné sportovní kalhoty)
-3) Lego – konkrétní sety s číslem (ne bulk kg)
-4) Herní konzole PS4/PS5/Nintendo Switch (OLED/Lite) + žádané hry pro tyto platformy
+=== ODHA TRŽNÍ CENY (KRITICKÉ – BUĎ KONZERVATIVNÍ) ===
+market_price_estimate = cena, za kterou se to v ČR REÁLNĚ prodá na Vinted/FB do 7 dnů, NE:
+- nová maloobchodní cena
+- ideální „sběratelská“ cena
+- evropský průměr BrickLink bez dopravy
+- cena za kus ve perfektním stavu s krabicí, pokud to inzerát nemá
 
-TENISKY – whitelist (pouze tyto):
+Pravidla odhadu:
+1. Vždy počítej s použitým stavem, běžným opotřebením, chybějící krabicí a lokální konkurencí v ČR.
+2. Když si nejsi jistý, sniž odhad o 15–25 %.
+3. U konzolí bez her/příslušenství sniž odhad. U her samotných buď přísný.
+4. U tenisek bez krabice / nošených sniž odhad. Repliky a podezřelé collaby = should_buy false.
+5. U Lega: nekompletní, bez figurek, bulk bez čísla = nízká cena nebo reject.
+6. Raději podstřel trh než přestřel – lepší minout slabý deal než poslat falešný „good deal“.
+
+POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
+1) Tenisky – JEN whitelist níže
+2) Vintage / streetwear Nike a Adidas (mikiny, bundy, dresy – ne obyčejné fleecové mikiny)
+3) Lego – konkrétní sety s číslem
+4) Konzole PS4/PS5/Nintendo Switch (OLED/Lite) + žádané hry pro tyto platformy
+
+TENISKY – whitelist:
 - Nike: Air Force 1, Dunk Low, Dunk High, Jordan 1, Jordan 4, Blazer, Cortez
 - Adidas: Samba, Gazelle, Campus, Spezial, Handball Spezial, Ultraboost, Superstar, Stan Smith
-ODMÍTNI vždy: Revolution, VS Pace, Air Max (kromě kolaborací co nejsou na whitelistu), Huarache, Monarch, Satire,
-ACG, Terrex, trail/outdoor boty, kopačky, sálovky, dětské boty, generické "Nike Air", low-end běžecké.
+ODMÍTNI: Revolution, VS Pace, Huarache, Monarch, Satire, ACG, Terrex, trail/outdoor,
+kopačky, sálovky, dětské boty, generické „Nike Air“, low-end běžecké, většinu Air Max mimo whitelist.
 
 VINTAGE / STREETWEAR:
-- Preferuj: starší mikiny, bundy, dresy s dobrým stavem
-- Odmítni: obyčejné fleecové mikiny, ponožky, čepice, dětské low-end, nové levné sportovní kalhoty
+- Preferuj: starší mikiny, bundy, dresy v dobrém stavu
+- Odmítni: obyčejné fleecové mikiny, ponožky, čepice, dětské low-end
 
 LEGO:
 - Preferuj: set s číslem (Star Wars, Technic, Icons, Minecraft, Harry Potter, Creator, City)
 - Odmítni: bulk bez čísla, Duplo na váhu, CHEVA, nekompletní bez figurek
 
 KONZOLE + HRY:
-- POVOLENO: PS4, PS5, Nintendo Switch (včetně OLED/Lite), Switch 2 pokud reálně existuje a cena dává smysl
-- POVOLENÉ HRY: Mario, Zelda, Animal Crossing, Smash, Odyssey, BOTW, TOTK, Pokémon,
-  God of War, Spider-Man, Horizon, The Last of Us, Ghost of Tsushima, RDR, GTA, Call of Duty
-- ODMÍTNI VŽDY: Nintendo Wii, Wii U, hry na Wii/Wii U, Just Dance, Fifa samotná bez konzole,
-  levné sportovní tituly, neznámé low-demand hry, čínské handheldy, samotné příslušenství bez konzole
+- POVOLENO: PS4, PS5, Nintendo Switch (OLED/Lite)
+- HRY: Mario, Zelda, Animal Crossing, Smash, Odyssey, BOTW, TOTK, Pokémon,
+  God of War, Spider-Man, Horizon, The Last of Us, Ghost of Tsushima, RDR, GTA, CoD
+- ODMÍTNI: Wii, Wii U, hry na Wii/Wii U, Just Dance, samotné Fifa, low-demand tituly,
+  čínské handheldy, samotné příslušenství bez konzole
 
-PRAVIDLA CENY:
-1. Odhadni realistickou tržní cenu použitého kusu v ČR (2026) pro rychlý prodej na Vinted.
-2. discount_percent: ZÁPORNÉ = pod trhem (např. -25 = 25 % pod). KLADNÉ = nad trhem.
-3. should_buy=true JEN pokud:
-   - cena je pod trhem (discount ≤ -10, minimum -8 u top modelů)
-   - věc je v povolených kategoriích a na whitelistu
+PRAVIDLA ROZHODNUTÍ:
+1. Spočítej slevu: záporné % = pod trhem (např. -20 = 20 % pod).
+2. should_buy=true JEN pokud:
+   - cena je pod KONZERVATIVNÍM odhadem trhu (ideálně ≤ -12 %, minimum cca -10 %)
+   - věc je v povolených kategoriích
    - není scam / replika / neexistující model
-4. U slevy >40 % pod trhem buď opatrný (scam), ale u jasného modelu můžeš doporučit.
-5. Bez popisu: u jasného žádaného modelu (Samba, Dunk, Lego s číslem, Switch) můžeš doporučit; jinak přísněji.
+3. U slevy >35 % pod trhem buď velmi opatrný (často podvod) – doporuč jen při jasné důvěryhodnosti.
+4. Bez popisu: u jasného žádaného modelu můžeš doporučit, ale s ještě konzervativnějším trhem; jinak reject.
 
 Odpověz VÝHRADNĚ platným JSON (žádný markdown):
 {{
   "market_price_estimate": číslo,
   "discount_percent": číslo,
   "should_buy": true/false,
-  "reason": "1–2 věty česky: proč koupit / proč ne."
+  "reason": "1–2 věty česky: proč koupit / proč ne, s důrazem na reálnou prodejní cenu v ČR."
 }}
 """
 
@@ -113,7 +127,6 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                     timeout=55,
                 )
 
-                # Ochrana proti 429 – počkej a zkus znovu
                 if response.status_code == 429:
                     wait = 20 + (attempt * 15)
                     logger.warning(
@@ -143,8 +156,9 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                 except (TypeError, ValueError):
                     market_price = None
 
-                # Přepočet slevy (AI často vrací špatné znaménko)
+                # Konzervativní korekce: AI občas stále přestřelí → mírně stáhneme odhad
                 if market_price and market_price > 0:
+                    market_price = int(round(market_price * 0.92))
                     real_discount = ((price - market_price) / market_price) * 100.0
                     discount = round(real_discount, 1)
 
@@ -158,9 +172,9 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                             if disc >= 0:
                                 should_buy = False
                                 reason += " (cena není pod trhem)"
-                            elif disc > -8:
+                            elif disc > -10:
                                 should_buy = False
-                                reason += " (sleva pod 8 %)"
+                                reason += " (sleva pod 10 % po konzervativním odhadu)"
                         except (TypeError, ValueError):
                             should_buy = False
 
@@ -168,7 +182,6 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                     f"Gemini eval: {title[:55]}... → buy={should_buy}, "
                     f"discount={discount}%, market={market_price}, reason={reason}"
                 )
-                # Delší pauza proti rate limitu
                 time.sleep(3.0)
                 return should_buy, reason, discount, market_price
 

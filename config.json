@@ -2,67 +2,99 @@
   "database_path": "./data/listings.db",
   "searches": [
     {
-      "name": "Nike tenisky",
+      "name": "Nike / Jordan tenisky",
       "source": "bazos_cz",
       "url": "https://obleceni.bazos.cz/inzeraty/nike/",
-      "price_min": 500,
-      "price_max": 8000,
-      "max_pages": 2
-    },
-    {
-      "name": "Adidas tenisky / vintage",
-      "source": "bazos_cz",
-      "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
-      "price_min": 400,
-      "price_max": 6000,
-      "max_pages": 2
-    },
-    {
-      "name": "Lego sety",
-      "source": "bazos_cz",
-      "url": "https://deti.bazos.cz/inzeraty/lego/",
-      "price_min": 150,
-      "price_max": 15000,
-      "max_pages": 2
-    },
-    {
-      "name": "PlayStation konzole",
-      "source": "bazos_cz",
-      "url": "https://pc.bazos.cz/inzeraty/playstation/",
       "price_min": 800,
-      "price_max": 15000,
-      "max_pages": 2
-    },
-    {
-      "name": "Nintendo Switch konzole",
-      "source": "bazos_cz",
-      "url": "https://pc.bazos.cz/inzeraty/nintendo/",
-      "price_min": 1500,
       "price_max": 12000,
       "max_pages": 2
     },
     {
-      "name": "Žádané hry Nintendo",
+      "name": "Adidas tenisky",
       "source": "bazos_cz",
-      "search_term": "Mario OR Zelda OR \"Animal Crossing\" OR \"Super Smash\" OR Odyssey OR \"Breath of the Wild\" OR \"Tears of the Kingdom\" OR Pokemon",
-      "price_min": 300,
+      "url": "https://obleceni.bazos.cz/inzeraty/adidas/",
+      "price_min": 600,
+      "price_max": 8000,
+      "max_pages": 2
+    },
+    {
+      "name": "DC Shoes",
+      "source": "bazos_cz",
+      "search_term": "DC shoes OR \"DC Shoes\" OR DCSHOES",
+      "price_min": 400,
+      "price_max": 5000,
+      "max_pages": 2
+    },
+    {
+      "name": "New Era",
+      "source": "bazos_cz",
+      "search_term": "\"New Era\" OR NewEra OR \"59fifty\" OR \"9forty\"",
+      "price_min": 200,
       "price_max": 2500,
       "max_pages": 2
     },
     {
-      "name": "Žádané hry PlayStation",
+      "name": "iPhone 12",
       "source": "bazos_cz",
-      "search_term": "\"God of War\" OR \"Spider-Man\" OR Horizon OR \"The Last of Us\" OR \"Ghost of Tsushima\" OR \"Red Dead\" OR GTA OR \"Call of Duty\"",
-      "price_min": 200,
-      "price_max": 2000,
+      "search_term": "\"iPhone 12\" OR \"iphone 12\" OR \"iPhone12\"",
+      "price_min": 3000,
+      "price_max": 12000,
       "max_pages": 2
     },
     {
-      "name": "Sbazar Nike",
-      "source": "sbazar_cz",
-      "search_term": "nike",
+      "name": "iPhone 13",
+      "source": "bazos_cz",
+      "search_term": "\"iPhone 13\" OR \"iphone 13\" OR \"iPhone13\"",
+      "price_min": 4000,
+      "price_max": 16000,
+      "max_pages": 2
+    },
+    {
+      "name": "iPhone 14",
+      "source": "bazos_cz",
+      "search_term": "\"iPhone 14\" OR \"iphone 14\" OR \"iPhone14\"",
+      "price_min": 5000,
+      "price_max": 22000,
+      "max_pages": 2
+    },
+    {
+      "name": "iPhone 15",
+      "source": "bazos_cz",
+      "search_term": "\"iPhone 15\" OR \"iphone 15\" OR \"iPhone15\"",
+      "price_min": 7000,
+      "price_max": 30000,
+      "max_pages": 2
+    },
+    {
+      "name": "iPhone 16",
+      "source": "bazos_cz",
+      "search_term": "\"iPhone 16\" OR \"iphone 16\" OR \"iPhone16\"",
+      "price_min": 10000,
+      "price_max": 40000,
+      "max_pages": 2
+    },
+    {
+      "name": "MacBook",
+      "source": "bazos_cz",
+      "url": "https://pc.bazos.cz/inzeraty/macbook/",
+      "price_min": 5000,
+      "price_max": 55000,
+      "max_pages": 2
+    },
+    {
+      "name": "Lego sběratelské",
+      "source": "bazos_cz",
+      "url": "https://deti.bazos.cz/inzeraty/lego/",
       "price_min": 500,
-      "price_max": 8000,
+      "price_max": 25000,
+      "max_pages": 2
+    },
+    {
+      "name": "Sbazar Nike Jordan",
+      "source": "sbazar_cz",
+      "search_term": "nike OR jordan",
+      "price_min": 800,
+      "price_max": 12000,
       "max_pages": 2,
       "fetch_details": true,
       "max_details": 20
@@ -71,41 +103,81 @@
       "name": "Sbazar Adidas",
       "source": "sbazar_cz",
       "search_term": "adidas",
-      "price_min": 400,
-      "price_max": 6000,
+      "price_min": 600,
+      "price_max": 8000,
       "max_pages": 2,
       "fetch_details": true,
-      "max_details": 20
+      "max_details": 15
+    },
+    {
+      "name": "Sbazar iPhone 12",
+      "source": "sbazar_cz",
+      "search_term": "iphone 12",
+      "price_min": 3000,
+      "price_max": 12000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 12
+    },
+    {
+      "name": "Sbazar iPhone 13",
+      "source": "sbazar_cz",
+      "search_term": "iphone 13",
+      "price_min": 4000,
+      "price_max": 16000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 12
+    },
+    {
+      "name": "Sbazar iPhone 14",
+      "source": "sbazar_cz",
+      "search_term": "iphone 14",
+      "price_min": 5000,
+      "price_max": 22000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 12
+    },
+    {
+      "name": "Sbazar iPhone 15",
+      "source": "sbazar_cz",
+      "search_term": "iphone 15",
+      "price_min": 7000,
+      "price_max": 30000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 12
+    },
+    {
+      "name": "Sbazar iPhone 16",
+      "source": "sbazar_cz",
+      "search_term": "iphone 16",
+      "price_min": 10000,
+      "price_max": 40000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 12
+    },
+    {
+      "name": "Sbazar MacBook",
+      "source": "sbazar_cz",
+      "search_term": "macbook",
+      "price_min": 5000,
+      "price_max": 55000,
+      "max_pages": 1,
+      "fetch_details": true,
+      "max_details": 15
     },
     {
       "name": "Sbazar Lego",
       "source": "sbazar_cz",
       "search_term": "lego",
-      "price_min": 150,
-      "price_max": 12000,
+      "price_min": 500,
+      "price_max": 20000,
       "max_pages": 2,
       "fetch_details": true,
       "max_details": 20
-    },
-    {
-      "name": "Sbazar PlayStation",
-      "source": "sbazar_cz",
-      "search_term": "playstation",
-      "price_min": 1000,
-      "price_max": 15000,
-      "max_pages": 1,
-      "fetch_details": true,
-      "max_details": 15
-    },
-    {
-      "name": "Sbazar Nintendo",
-      "source": "sbazar_cz",
-      "search_term": "nintendo switch",
-      "price_min": 1500,
-      "price_max": 12000,
-      "max_pages": 1,
-      "fetch_details": true,
-      "max_details": 15
     }
   ]
 }

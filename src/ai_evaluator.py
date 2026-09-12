@@ -65,8 +65,8 @@ POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
 - New Era: originální kšiltovky 59FIFTY / 9FORTY (ne no-name)
 ODMÍTNI: Revolution, VS Pace, generické běžecké, kopačky, dětské low-end, jasné repliky
 
-2) iPhone – POUZE řady 14, 15, 16 (včetně Plus / Pro / Pro Max / mini kde dává smysl)
-- ODMÍTNI: iPhone 13 a starší, SE, nejasný model, extrémně nízká cena bez baterie/popisu (scam)
+2) iPhone – POUZE řady 12, 13, 14, 15, 16 (včetně Plus / Pro / Pro Max / mini)
+- ODMÍTNI: iPhone 11 a starší, staré SE (kromě modelů spadajících do 12+ generací pokud explicitně sedí), nejasný model, extrémně nízká cena bez baterie/popisu (scam)
 - Sleduj: % baterie, iCloud lock, Face ID, stav displeje
 
 3) MacBook

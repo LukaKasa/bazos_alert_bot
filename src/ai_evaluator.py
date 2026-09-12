@@ -36,8 +36,8 @@ class AIEvaluator:
 
         price = int(price_clean)
 
-        prompt = f"""Jsi PŘÍSNÝ a KONZERVATIVNÍ expert na český bazarový flipping (Bazoš/Sbazar → Vinted + FB Marketplace) v roce 2026.
-Cíl: koupit pod cenou a prodat do 1–7 dní. Notifikuj POUZE reálně výhodné věci z povolených kategorií.
+        prompt = f"""Jsi PŘÍSNÝ expert na RÝCHLÝ prodej z druhé ruky v České republice (2026).
+Flipping: Bazoš/Sbazar → Vinted + Facebook Marketplace, prodej do 1–7 dnů.
 
 Nabídka:
 - Titulek: {title}
@@ -45,55 +45,55 @@ Nabídka:
 - Lokalita: {location or "neznámá"}
 - Popis: {(description or "bez popisu")[:550]}
 
-=== ODHA TRŽNÍ CENY (KONZERVATIVNÍ) ===
-market_price_estimate = cena, za kterou se to v ČR REÁLNĚ prodá na Vinted/FB do 7 dnů.
-NE nová maloobchodní cena, NE ideální sběratelská cena, NE EU průměr.
+=== TRŽNÍ CENA – NEJDŮLEŽITĚJŠÍ PRAVIDLO ===
+market_price_estimate = částka, za kterou by to BĚŽNÝ kupující v ČR reálně koupil v příštích dnech na Vinted/FB.
 
-Pravidla:
-1. Počítej s použitým stavem, opotřebením, chybějící krabicí a konkurencí v ČR.
-2. Když si nejsi jistý, sniž odhad o 15–25 %.
-3. Raději podstřel trh než přestřel.
-4. Podezřele levné telefony/notebooky bez popisu baterie/iCloud = vysoké riziko podvodu → should_buy false.
+VŽDY PODSTŘELUJ. Typická chyba je přestřelit o 20–40 %. Tomu se vyhni.
 
-POVOLENÉ KATEGORIE (vše ostatní → should_buy=false):
+ZAKÁZANÉ kotvy (nepoužívej):
+- nová cena v Alze/Datartu
+- „zánovní / jako nové“ pokud to není výslovně top stav s krabicí
+- zahraniční eBay / US / DE ceny bez ohledu na DPH a dopravu
+- sběratelské maximum
 
-1) SBĚRATELSKÉ / ŽÁDANÉ TENISKY A DOPLŇKY
-- Nike: Air Force 1, Dunk, Jordan 1, Jordan 4, Blazer, Cortez, žádané collaby
-- Jordan (samostatně i Nike Jordan)
-- Adidas: Samba, Gazelle, Campus, Spezial, Handball Spezial, Ultraboost, Superstar, Stan Smith, žádané collaby
-- DC Shoes: žádané skate siluety (Court Graffik, Legacy, pure apod.) v dobrém stavu
-- New Era: originální kšiltovky 59FIFTY / 9FORTY (ne no-name)
-ODMÍTNI: Revolution, VS Pace, generické běžecké, kopačky, dětské low-end, jasné repliky
+POVINNÉ kotvy:
+- ceny POUŽITÝCH kusů v ČR, které se opravdu točí
+- chybějící krabice, běžné škrábance, nižší baterie = NIŽŠÍ odhad
+- když chybí specifikace (u MacBooku čip/RAM/SSD, u iPhonu baterie) = odhaduj SPODNÍ pásmo daného modelu
 
-2) iPhone – POUZE řady 12, 13, 14, 15, 16 (včetně Plus / Pro / Pro Max / mini)
-- ODMÍTNI: iPhone 11 a starší, staré SE (kromě modelů spadajících do 12+ generací pokud explicitně sedí), nejasný model, extrémně nízká cena bez baterie/popisu (scam)
-- Sleduj: % baterie, iCloud lock, Face ID, stav displeje
+MacBook:
+- použité Air/Pro s M1/M2 často jdou výrazně levněji než lidé čekají
+- bez přesné konfigurace ber SPODNÍ reálnou CZ cenu dané generace
+- nepřirovnávej k novému kusům
 
-3) MacBook
-- Air / Pro – preferuj Apple Silicon (M1/M2/M3/M4) pokud je v popisu
-- ODMÍTNI: mrtvé kusy, silně poškozené, podezřele levné bez specifikace
-- Sleduj: rok/čip/RAM/SSD pokud jsou uvedené
+iPhone 12–16:
+- rozhoduje % baterie a stav
+- baterie pod 85 % = výrazně nižší trh
+- bez uvedení baterie = konzervativní (nižší) odhad
 
-4) SBĚRATELSKÉ LEGO
-- Konkrétní set s číslem (Star Wars, Technic, Icons, Creator Expert, Modular, žádané City/Minecraft/HP)
-- Nové/nerozbalené = bonus
-- ODMÍTNI: bulk kg bez čísla, Duplo na váhu, CHEVA, nekompletní bez figurek, čínské kopie
+Tenisky / Lego:
+- nošené bez krabice = nižší pásmo
+- Lego nekompletní / bez figurek = výrazně níž nebo reject
 
-PRAVIDLA ROZHODNUTÍ:
-1. discount_percent: záporné = pod trhem (např. -20 = 20 % pod).
-2. should_buy=true JEN pokud:
-   - cena je pod konzervativním trhem (ideálně ≤ -12 %, minimum cca -10 %)
-   - kategorie je povolená
-   - není scam / replika / špatný model iPhonu
-3. U slevy >35 % u telefonů a MacBooků buď velmi opatrný.
-4. Bez popisu: u jasného modelu tenisky/Lego s číslem možné; u iPhone/MacBook spíš reject.
+POVOLENÉ KATEGORIE (jinak should_buy=false):
+1) Nike/Jordan, Adidas (žádané siluety), DC Shoes, New Era
+2) iPhone 12, 13, 14, 15, 16 (+ Plus/Pro/Pro Max/mini)
+3) MacBook Air/Pro
+4) Lego set s číslem (sběratelské)
 
-Odpověz VÝHRADNĚ platným JSON (žádný markdown):
+ODMÍTNI: iPhone 11 a starší, generické běžecké boty, kopačky, bulk Lego bez čísla, zjevné scamy.
+
+ROZHODNUTÍ:
+- discount_percent záporné = pod trhem
+- should_buy=true jen při reálné slevě cca 15 %+ pod TVÝM konzervativním odhadem
+- u telefonů/MacBooků při slevě >35 % silně zvaž scam
+
+Odpověz VÝHRADNĚ JSON:
 {{
   "market_price_estimate": číslo,
   "discount_percent": číslo,
   "should_buy": true/false,
-  "reason": "1–2 věty česky: proč koupit / proč ne."
+  "reason": "1–2 věty česky"
 }}
 """
 
@@ -102,7 +102,7 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
-                "temperature": 0.1,
+                "temperature": 0.05,
                 "maxOutputTokens": 500,
                 "responseMimeType": "application/json",
             },
@@ -148,9 +148,22 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                 except (TypeError, ValueError):
                     market_price = None
 
-                # Konzervativní korekce trhu (−8 %)
+                # Silná konzervativní korekce: AI u CZ bazaru často přestřelí 20–30 %
                 if market_price and market_price > 0:
-                    market_price = int(round(market_price * 0.92))
+                    title_l = (title or "").lower()
+                    desc_l = (description or "").lower()
+                    is_electronics = any(
+                        k in title_l or k in desc_l
+                        for k in (
+                            "macbook",
+                            "iphone",
+                            "mac book",
+                            "air m",
+                            "pro m",
+                        )
+                    )
+                    factor = 0.78 if is_electronics else 0.88
+                    market_price = int(round(market_price * factor))
                     real_discount = ((price - market_price) / market_price) * 100.0
                     discount = round(real_discount, 1)
 
@@ -164,9 +177,9 @@ Odpověz VÝHRADNĚ platným JSON (žádný markdown):
                             if disc >= 0:
                                 should_buy = False
                                 reason += " (cena není pod trhem)"
-                            elif disc > -10:
+                            elif disc > -15:
                                 should_buy = False
-                                reason += " (sleva pod 10 % po konzervativním odhadu)"
+                                reason += " (sleva pod 15 % po konzervativním odhadu)"
                         except (TypeError, ValueError):
                             should_buy = False
 
